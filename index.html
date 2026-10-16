@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Objetos PL/SQL identificados | Taller de Base de Datos</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <div id="app" v-cloak></div>
+
+  <!-- Vue 3 por CDN. Si la sala no tiene internet, se usa la copia de la carpeta vendor. -->
+  <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.prod.js"></script>
+  <script>
+    if (!window.Vue) document.write('<script src="vendor/vue.global.prod.js"><\/script>');
+  </script>
+
+  <!-- 1) el PL/SQL  2) los textos  3) la app -->
+  <script src="js/codigos.js"></script>
+  <script src="js/contenido.js"></script>
+  <script>
+    if (window.Vue) {
+      document.write('<script src="js/app.js"><\/script>');
+    } else {
+      document.getElementById('app').removeAttribute('v-cloak');
+      document.getElementById('app').innerHTML =
+        '<p class="sin-vue">No se pudo cargar Vue. Revisa la conexión a internet o que exista el archivo vendor/vue.global.prod.js dentro de esta carpeta.</p>';
+    }
+  </script>
+</body>
+</html>

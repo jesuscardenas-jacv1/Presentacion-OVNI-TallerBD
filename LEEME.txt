@@ -1,0 +1,58 @@
+PRESENTACIÓN OVNI — Evaluación Parcial N.º 2, Taller de Base de Datos
+======================================================================
+
+CÓMO ABRIRLA
+  Doble clic en index.html (Chrome o Edge). No hay que instalar nada.
+  Vue 3 se carga por CDN; si no hay internet se usa la copia de la
+  carpeta vendor, así que funciona igual sin conexión.
+
+TECLAS
+  Flecha derecha / espacio   lámina siguiente
+  Flecha izquierda           lámina anterior
+  G                          índice (muestra qué falta por cargar)
+  P                          modo ensayo (preguntas de la guía del profe)
+  Z                          ampliar o reducir el código
+  1 y 2                      cambiar de pestaña en las láminas de código
+  F                          pantalla completa
+  Esc                        cerrar índice, ensayo o código ampliado
+
+LÁMINA 2: LA NAVE QUE CAE
+  Al llegar a la lámina el alien escribe un trigger con error de tabla
+  mutante (ORA-04091) y la animación SE DETIENE para explicar la consulta.
+  Para continuar: botón "Ejecutar", o espacio, Enter, flecha derecha o
+  el clicker. Ahí el alien aprieta START, la nave entra en alerta y cae
+  en un maizal. Flecha izquierda vuelve a la lámina anterior. Al final aparece la explicación con
+  los botones "Repetir la misión" y "Ver los triggers".
+  "Saltar al final" va directo a la explicación.
+  El código y el error de la pantalla se cambian en js/codigos.js, claves
+  caida_sql y caida_error. Los textos del final, en js/contenido.js (id 'mision').
+
+LÁMINA 3: LA CORRECCIÓN
+  El mismo trigger sin FOR EACH ROW (trigger de sentencia). También se
+  detiene después de escribir el código para explicarlo. Al ejecutar:
+  sale bien, la nave llega a la granja, abduce a la vaca y terminan los
+  dos en el sillón tomando jugo mientras viajan por el espacio.
+  Código y salida: js/codigos.js, claves correccion_sql y correccion_salida.
+  OJO: "Entregas fallidas: 1" es un ejemplo; pongan el número que les
+  dé al ejecutarlo de verdad en SQL Developer.
+
+QUÉ ARCHIVO SE EDITA
+  js/codigos.js     El PL/SQL y las consultas. Se pega entre las comillas
+                    invertidas de cada clave. Clave vacía = la lámina
+                    muestra "Falta cargar este código".
+  js/contenido.js   Los textos de cada lámina, los nombres del equipo,
+                    la tabla de pruebas, las evidencias de IA y las
+                    conclusiones. Lo que tenga '' aparece como pendiente.
+  css/estilos.css   Colores y tamaños.
+  js/app.js         La app en Vue. Normalmente no se toca.
+
+Después de editar: guardar y recargar con F5.
+
+QUÉ FALTA (también se ve con la tecla G)
+  - Procedimiento sin parámetros y su ejecución
+  - Función sin parámetros y su consulta
+  - Trigger a nivel de sentencia y su prueba
+  - Consulta que comprueba el trigger de fila
+  - Columna "Se obtuvo" de la tabla de pruebas (ejecutar en SQL Developer)
+  - Las 4 evidencias de IA, con casos que hayan pasado de verdad
+  - Límites, mejoras y aprendizaje en las conclusiones
