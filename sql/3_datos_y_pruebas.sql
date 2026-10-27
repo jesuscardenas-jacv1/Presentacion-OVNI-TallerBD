@@ -146,7 +146,8 @@ FROM ruta
 ORDER BY id_ruta;
 
 -- P7. total_pedidos_en_ruta: sin parámetros.
--- Esperado: 3 (pedidos 2, 3 y 4).
+-- Esperado: 3 (pedidos 2, 3 y 4) si se ejecuta antes de P12. Al final del
+-- script da 1, porque P12 ya dejó los pedidos 2 y 3 como ENTREGADO.
 SELECT pkg_reparto.total_pedidos_en_ruta AS en_ruta
 FROM dual;
 

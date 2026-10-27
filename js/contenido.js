@@ -482,7 +482,7 @@ window.PRESENTACION = {
           esperado: 'Un error por caso; nada cambia', obtenido: 'Los 4 mensajes salieron como se esperaba. La comprobación de estados queda por confirmar.' },
         { objeto: 'las dos funciones', prueba: 'Con y sin parámetros (P6, P7)',
           datos: 'Todas las rutas; desde DUAL',
-          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3', obtenido: 'Pendiente: revisar el resultado de la consulta.' },
+          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3 (antes de P12)', obtenido: 'Ruta 1: 1, ruta 2: 0. En ruta: 1 al final del script, porque P12 ya dejó los pedidos 2 y 3 como ENTREGADO. El 3 corresponde a antes de P12.' },
         { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa si se actualiza resultado_entrega, no otra columna (P8, P9)',
           datos: 'Después de P1; UPDATE de foto_url',
           esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: 'El UPDATE de foto_url no imprime nada del trigger de sentencia. El conteo de avisos queda pendiente.' },
