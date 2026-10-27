@@ -235,9 +235,11 @@ END;
 
 -- P14. La función privada no se ve desde fuera.
 -- Esperado: error PLS-00302: component 'ES_RAZON_VALIDA' must be declared.
-BEGIN
-    IF pkg_reparto.es_razon_valida('CLIENTE_AUSENTE') THEN
-        DBMS_OUTPUT.PUT_LINE('No debería llegar aquí');
-    END IF;
-END;
-/
+-- Este bloque está comentado a propósito, porque el error corta el script.
+-- Para mostrarlo en la defensa, descomentar y ejecutar solo este bloque.
+-- BEGIN
+--     IF pkg_reparto.es_razon_valida('CLIENTE_AUSENTE') THEN
+--         DBMS_OUTPUT.PUT_LINE('No debería llegar aquí');
+--     END IF;
+-- END;
+-- /
