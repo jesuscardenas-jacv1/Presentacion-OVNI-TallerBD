@@ -11,6 +11,8 @@ TECLAS
   Flecha izquierda           lámina anterior
   G                          índice (muestra qué falta por cargar)
   P                          modo ensayo (preguntas de la guía del profe)
+                             En el modo ensayo, la lista "Pruebas" muestra el resultado
+                             de SQL y qué decir en la defensa. Esc vuelve a la lista.
   Z                          ampliar o reducir el código
   1 y 2                      cambiar de pestaña en las láminas de código
   F                          pantalla completa

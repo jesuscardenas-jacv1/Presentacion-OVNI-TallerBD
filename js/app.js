@@ -1192,14 +1192,51 @@
 
           <p v-if="aviso" class="aviso-falta">{{ aviso }}</p>
 
-          <aside v-if="vista === 'ensayo'" class="ensayo">
-            <h2>Modo ensayo</h2>
-            <p class="ensayo-como">Preguntas de la guía que el profe puede hacer en esta lámina. Respóndelas en voz alta antes de mirar el código.</p>
-            <ul v-if="actual.preguntas && actual.preguntas.length">
-              <li v-for="q in actual.preguntas" :key="q">{{ q }}</li>
-            </ul>
-            <p v-else class="hueco">Esta lámina no tiene preguntas asociadas.</p>
-            <button class="ctl" @click="vista = ''">Cerrar (P)</button>
+          <aside v-if="vista === 'ensayo'" class="ensayo" :class="{ ancho: pruebaActiva }">
+            <template v-if="!pruebaActiva">
+              <h2>Modo ensayo</h2>
+              <p class="ensayo-como">Preguntas de la guía que el profe puede hacer en esta lámina. Respóndelas en voz alta antes de mirar el código.</p>
+              <ul v-if="actual.preguntas && actual.preguntas.length">
+                <li v-for="q in actual.preguntas" :key="q">{{ q }}</li>
+              </ul>
+              <p v-else class="hueco">Esta lámina no tiene preguntas asociadas.</p>
+              <h3 class="ensayo-sub">Pruebas: resultado y qué decir</h3>
+              <ol class="pruebas-lista">
+                <li v-for="p in pruebasDefensa" :key="p.id">
+                  <button class="ctl prueba-btn" @click="prueba = p.id">{{ p.id }} · {{ p.titulo }}</button>
+                </li>
+              </ol>
+              <button class="ctl" @click="vista = ''">Cerrar (P)</button>
+            </template>
+
+            <template v-else>
+              <h2>{{ pruebaActiva.id }} · {{ pruebaActiva.titulo }}</h2>
+              <div class="prueba-cols">
+                <section class="col-sql">
+                  <h3>Resultado de SQL</h3>
+                  <pre class="consulta">{{ pruebaActiva.consulta }}</pre>
+                  <div v-if="pruebaActiva.salida && pruebaActiva.salida.length" class="salida">
+                    <div v-for="(l, i) in pruebaActiva.salida" :key="i">{{ l }}</div>
+                  </div>
+                  <table v-if="pruebaActiva.tabla" class="resultado">
+                    <thead><tr><th v-for="c in pruebaActiva.tabla.columnas" :key="c">{{ c }}</th></tr></thead>
+                    <tbody>
+                      <tr v-for="(f, i) in pruebaActiva.tabla.filas" :key="i"><td v-for="(v, j) in f" :key="j">{{ v }}</td></tr>
+                    </tbody>
+                  </table>
+                  <p v-if="pruebaActiva.nota" class="nota-prueba">{{ pruebaActiva.nota }}</p>
+                  <p v-if="pruebaActiva.pendiente" class="pendiente">{{ pruebaActiva.pendiente }}</p>
+                </section>
+                <section class="col-decir">
+                  <h3>Qué decir</h3>
+                  <p v-for="(d, i) in pruebaActiva.decir" :key="i">{{ d }}</p>
+                </section>
+              </div>
+              <div class="prueba-pie">
+                <button class="ctl" @click="prueba = ''">Volver a la lista</button>
+                <button class="ctl" @click="prueba = ''; vista = ''">Cerrar (P)</button>
+              </div>
+            </template>
           </aside>
 
           <section v-if="vista === 'indice'" class="indice" aria-label="Índice de láminas">
@@ -1226,6 +1263,9 @@
       const total = laminas.length;
       const indice = ref(0);
       const vista = ref('');
+      const prueba = ref('');
+      const pruebasDefensa = DATOS.pruebasDefensa;
+      const pruebaActiva = computed(() => pruebasDefensa.find((p) => p.id === prueba.value) || null);
       const viajando = ref(false);
       const escala = ref(1);
 
@@ -1257,7 +1297,7 @@
       const irA = (id) => { const n = laminas.findIndex((l) => l.id === id); if (n >= 0) ir(n); };
       const siguiente = () => ir(indice.value + 1);
       const anterior = () => ir(indice.value - 1);
-      const alternar = (cual) => { vista.value = vista.value === cual ? '' : cual; };
+      const alternar = (cual) => { prueba.value = ''; vista.value = vista.value === cual ? '' : cual; };
 
       const pantallaCompleta = () => {
         if (document.fullscreenElement) document.exitFullscreen();
@@ -1268,6 +1308,7 @@
         if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
         const enBoton = ev.target && ev.target.tagName === 'BUTTON';
         const k = ev.key;
+        if (k === 'Escape' && prueba.value) { prueba.value = ''; return; }
         if (k === 'Escape') { vista.value = ''; ui.ampliado = false; return; }
         if (k === 'g' || k === 'G') { alternar('indice'); return; }
         if (k === 'p' || k === 'P') { alternar('ensayo'); return; }
@@ -1305,7 +1346,8 @@
 
       return {
         laminas, total, indice, actual, progreso, conCabecera, aviso, totalFaltas, estrellas,
-        vista, viajando, escala, ir, irA, siguiente, anterior, alternar, falta: textoFaltante
+        vista, viajando, escala, ir, irA, siguiente, anterior, alternar, falta: textoFaltante,
+        prueba, pruebasDefensa, pruebaActiva
       };
     }
   };
