@@ -154,10 +154,10 @@ ul, ol { padding: 0; list-style: none; }
 .objetivo p { font-size: 28px; line-height: 1.34; }
 
 /* ---------- Mapa de objetos ---------- */
-.l-mapa { display: flex; flex-direction: column; gap: 20px; }
-.flujo h2 { margin-bottom: 10px; color: var(--rayo); font-size: 24px; }
+.l-mapa { display: flex; flex-direction: column; gap: 12px; }
+.flujo h2 { margin-bottom: 6px; color: var(--rayo); font-size: 24px; }
 .pasos { display: flex; gap: 46px; }
-.paso { position: relative; flex: 1 1 0; max-width: 344px; min-height: 126px; padding: 12px 18px 14px; border-radius: 6px; background: rgba(13, 9, 38, .72); border: 2px solid var(--acero); display: flex; flex-direction: column; }
+.paso { position: relative; flex: 1 1 0; max-width: 344px; min-height: 108px; padding: 12px 18px 14px; border-radius: 6px; background: rgba(13, 9, 38, .72); border: 2px solid var(--acero); display: flex; flex-direction: column; }
 .paso + .paso::before { content: ""; position: absolute; left: -40px; top: 50%; width: 32px; height: 4px; background: var(--rayo); }
 .paso + .paso::after { content: ""; position: absolute; left: -16px; top: 50%; margin-top: -9px; border: 11px solid transparent; border-left-color: var(--rayo); border-right-width: 0; }
 .paso-tipo { font-size: 19px; color: var(--lavanda); }

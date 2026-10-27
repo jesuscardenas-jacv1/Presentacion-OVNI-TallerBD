@@ -88,15 +88,21 @@ window.PRESENTACION = {
             { tipo: 'Función', nombre: 'contar_pedidos_fallidos', que: 'cuenta los fallidos de una ruta' },
             { tipo: 'Tablas', nombre: 'pedido y factura', que: 'solo lectura' }
           ]
+        },
+        {
+          nombre: 'Al cerrar la jornada',
+          pasos: [
+            { tipo: 'Quién', nombre: 'Logística', que: 'revisa cuánto queda por entregar' },
+            { tipo: 'Función', nombre: 'total_pedidos_en_ruta', que: 'cuenta los pedidos que siguen en ruta' },
+            { tipo: 'Procedimiento', nombre: 'cerrar_rutas_completas', que: 'finaliza las rutas sin pendientes' },
+            { tipo: 'Tabla', nombre: 'ruta', que: 'queda en FINALIZADA' }
+          ]
         }
       ],
-      /* Se marcan solos como "por integrar" mientras su clave esté vacía en codigos.js */
-      porIntegrar: [
-        { nombre: 'Procedimiento sin parámetros', clave: 'proc_sin_parametros' },
-        { nombre: 'Función sin parámetros', clave: 'func_sin_parametros' },
-        { nombre: 'Trigger de sentencia', clave: 'trg_sentencia' }
-      ],
-      nota: 'Todo lo de reparto vive dentro del package pkg_reparto, salvo el trigger, que pertenece a la tabla factura.',
+      /* Ya no queda nada por integrar. Si se agrega un objeto nuevo, se puede volver a listar aquí
+         como { nombre, clave } y se marca solo como "por integrar" mientras su clave esté vacía. */
+      porIntegrar: [],
+      nota: 'Todo vive en pkg_reparto, salvo los dos triggers de factura: trg_notificar_entrega (fila) y trg_contar_fallidas (sentencia).',
       preguntas: [
         '101. ¿Cómo se relacionan los procedimientos, funciones, packages y triggers de nuestro proyecto?',
         '103. ¿Qué objetos dependen de otros objetos?',
@@ -153,9 +159,10 @@ window.PRESENTACION = {
       titulo: 'registrar_entrega, con parámetros',
       resumen: [
         'Recibe el pedido, el resultado y la razón; devuelve un mensaje por el parámetro OUT.',
-        'Si el resultado es FALLIDO exige una razón y la busca en el catálogo.',
+        'Solo acepta LOGRADO o FALLIDO, sin importar mayúsculas. Cualquier otro valor se rechaza.',
+        'Si es FALLIDO exige una razón y la valida con la función privada es_razon_valida.',
         'Actualiza pedido y factura. Si el pedido no existe, SQL%ROWCOUNT queda en 0 y se avisa.',
-        'COMMIT si todo sale bien, ROLLBACK ante cualquier excepción.'
+        'COMMIT si todo sale bien; ROLLBACK y mensaje por OUT ante cualquier excepción.'
       ],
       paneles: [
         { etiqueta: 'Código', clave: 'proc_registrar_entrega' },
@@ -174,9 +181,13 @@ window.PRESENTACION = {
       id: 'proc-sin',
       tipo: 'codigo',
       seccion: 'Procedimientos',
-      titulo: 'Procedimiento sin parámetros',
-      resumen: [],
-      queFalta: 'La pauta pide procedimientos con y sin parámetros. El repo solo tiene con parámetros; aquí va el que falta, con su ejecución.',
+      titulo: 'cerrar_rutas_completas, sin parámetros',
+      resumen: [
+        'No recibe nada: siempre revisa todas las rutas EN_CURSO.',
+        'Pasa a FINALIZADA las que tienen pedidos y no les queda ninguno CREADO ni EN_RUTA.',
+        'Una ruta sin pedidos no se cierra: el EXISTS lo impide.',
+        'SQL%ROWCOUNT dice cuántas cerró. Si se ejecuta dos veces, la segunda cierra 0.'
+      ],
       paneles: [
         { etiqueta: 'Código', clave: 'proc_sin_parametros' },
         { etiqueta: 'Cómo se ejecuta', clave: 'uso_proc_sin_parametros' }
@@ -206,7 +217,7 @@ window.PRESENTACION = {
       },
       columnas: [
         { titulo: 'Con parámetros', puntos: ['El resultado depende de lo que se le pase: contar_pedidos_fallidos(p_id_ruta).'] },
-        { titulo: 'Sin parámetros', puntos: ['Devuelve un dato que no depende de ninguna entrada, como un total general.'] }
+        { titulo: 'Sin parámetros', puntos: ['Devuelve un dato que no depende de ninguna entrada: total_pedidos_en_ruta.'] }
       ],
       preguntas: [
         '60. ¿Qué diferencia existe entre una función almacenada y un procedimiento almacenado?',
@@ -244,9 +255,13 @@ window.PRESENTACION = {
       id: 'func-sin',
       tipo: 'codigo',
       seccion: 'Funciones',
-      titulo: 'Función sin parámetros',
-      resumen: [],
-      queFalta: 'La pauta pide funciones con y sin parámetros. El repo solo tiene con parámetros; aquí va la que falta, con la consulta que la usa.',
+      titulo: 'total_pedidos_en_ruta, sin parámetros',
+      resumen: [
+        'No recibe nada y devuelve cuántos pedidos siguen EN_RUTA, sumando todas las rutas.',
+        'Solo lee pedido, así que se puede usar dentro de un SELECT.',
+        'Al no tener parámetros se llama sin paréntesis, desde DUAL.',
+        'Se comprueba con un COUNT(*) a mano: los dos números deben coincidir.'
+      ],
       paneles: [
         { etiqueta: 'Código', clave: 'func_sin_parametros' },
         { etiqueta: 'Uso en un SELECT', clave: 'uso_func_sin_parametros' }
@@ -275,9 +290,15 @@ window.PRESENTACION = {
         { nombre: 'contar_pedidos_fallidos', clase: 'función', publico: true,
           llamada: 'SELECT pkg_reparto.contar_pedidos_fallidos(1) FROM dual;',
           resultado: 'Devuelve un número: está declarada en la especificación.' },
-        { nombre: 'listar_pedidos_por_ruta', clase: 'procedimiento', publico: true,
-          llamada: 'pkg_reparto.listar_pedidos_por_ruta(1);',
-          resultado: 'Se ejecuta e imprime los pedidos de la ruta.' },
+        { nombre: 'cerrar_rutas_completas', clase: 'procedimiento sin parámetros', publico: true,
+          llamada: 'pkg_reparto.cerrar_rutas_completas;',
+          resultado: 'Se ejecuta e imprime cuántas rutas cerró.' },
+        { nombre: 'total_pedidos_en_ruta', clase: 'función sin parámetros', publico: true,
+          llamada: 'SELECT pkg_reparto.total_pedidos_en_ruta FROM dual;',
+          resultado: 'Devuelve un número: está declarada en la especificación.' },
+        { nombre: 'es_razon_valida', clase: 'función privada', publico: false,
+          llamada: "pkg_reparto.es_razon_valida('CLIENTE_AUSENTE')",
+          resultado: "PLS-00302: component 'ES_RAZON_VALIDA' must be declared" },
         { nombre: 'v_razones_fallo', clase: 'VARRAY con el catálogo', publico: false,
           llamada: 'pkg_reparto.v_razones_fallo(1)',
           resultado: "PLS-00302: component 'V_RAZONES_FALLO' must be declared" },
@@ -288,7 +309,7 @@ window.PRESENTACION = {
           llamada: 'WHEN pkg_reparto.e_razon_no_valida THEN ...',
           resultado: "PLS-00302: component 'E_RAZON_NO_VALIDA' must be declared" }
       ],
-      porque: 'Nadie de fuera puede cambiar el catálogo de razones ni depender de cómo validamos. Así se puede reescribir el cuerpo sin romper a quien usa el package.',
+      porque: 'Nadie de fuera puede cambiar el catálogo de razones ni depender de cómo validamos: es_razon_valida es un detalle interno de registrar_entrega. Así se puede reescribir el cuerpo sin romper a quien usa el package.',
       preguntas: [
         '72. ¿Qué diferencia existe entre la especificación y el cuerpo de un package?',
         '74. ¿Por qué decidimos exponer algunos procedimientos o funciones y mantener otros privados?',
@@ -304,14 +325,15 @@ window.PRESENTACION = {
       seccion: 'Package',
       titulo: 'Especificación y cuerpo de pkg_reparto',
       resumen: [
-        'La especificación declara qué existe: un tipo, dos procedimientos y una función.',
+        'La especificación declara qué existe: un tipo, tres procedimientos y dos funciones.',
         'El cuerpo guarda cómo funciona y lo que nadie más necesita ver.',
-        'Privados: el catálogo de razones y las dos excepciones de negocio.',
+        'Privados: el catálogo de razones, tres excepciones de negocio y la función es_razon_valida.',
         'Si cambia el cuerpo y no la especificación, quien usa el package no se entera.'
       ],
       paneles: [
         { etiqueta: 'Especificación (público)', clave: 'pkg_especificacion' },
-        { etiqueta: 'Cuerpo: lo privado', clave: 'pkg_privados' }
+        { etiqueta: 'Cuerpo: lo privado', clave: 'pkg_privados' },
+        { etiqueta: 'Función privada', clave: 'pkg_func_privada' }
       ],
       preguntas: [
         '166. Explique la organización de su package y distinga sus elementos públicos y privados.',
@@ -424,9 +446,14 @@ window.PRESENTACION = {
       id: 'trg-sentencia',
       tipo: 'codigo',
       seccion: 'Triggers',
-      titulo: 'Trigger a nivel de sentencia',
-      resumen: [],
-      queFalta: 'La pauta pide triggers a nivel de fila y de sentencia. El repo solo tiene el de fila; aquí va el de sentencia, con la prueba que muestra que dispara una vez.',
+      titulo: 'trg_contar_fallidas, a nivel de sentencia',
+      resumen: [
+        'Es el trigger de la nave, ya corregido: sin FOR EACH ROW.',
+        'Evento: después de un UPDATE de resultado_entrega en factura.',
+        'Se dispara una vez por sentencia, cambie 1 fila o 100, cuando el UPDATE ya terminó.',
+        'Por eso puede leer factura sin ORA-04091, pero no conoce :OLD ni :NEW.',
+        'Prueba: un UPDATE de 2 filas imprime una sola línea; el de fila crea 2 notificaciones.'
+      ],
       paneles: [
         { etiqueta: 'Código', clave: 'trg_sentencia' },
         { etiqueta: 'Cómo se comprueba', clave: 'uso_trg_sentencia' }
@@ -444,23 +471,27 @@ window.PRESENTACION = {
       tipo: 'pruebas',
       seccion: 'Pruebas',
       titulo: 'Lo que esperábamos y lo que salió',
-      /* "obtenido" se llena solo después de ejecutar la prueba en SQL Developer */
+      /* Las pruebas están en sql/3_datos_y_pruebas.sql (P1, P2...), con los datos que usan.
+         "obtenido" se llena solo después de ejecutarlas en SQL Developer. */
       filas: [
-        { objeto: 'registrar_entrega', prueba: 'Entrega fallida con razón del catálogo',
+        { objeto: 'registrar_entrega', prueba: 'Fallida con razón del catálogo (P1)',
           datos: "Pedido 1, 'FALLIDO', 'CLIENTE_AUSENTE'",
           esperado: 'Entrega registrada correctamente', obtenido: '' },
-        { objeto: 'registrar_entrega', prueba: 'Razón que no está en el catálogo',
-          datos: "Pedido 1, 'FALLIDO', 'Razon inventada'",
-          esperado: 'Error: razon de fallo no permitida', obtenido: '' },
-        { objeto: 'contar_pedidos_fallidos', prueba: 'Reporte de fallidos por ruta',
-          datos: 'SELECT sobre todas las rutas',
-          esperado: 'Una fila por ruta con su total', obtenido: '' },
-        { objeto: 'trg_notificar_entrega', prueba: 'La notificación se crea sola',
-          datos: 'Registrar una entrega y consultar notificacion',
-          esperado: 'Una notificación EMAIL nueva para ese pedido', obtenido: '' },
-        { objeto: 'Trigger de sentencia', prueba: 'Dispara una vez aunque cambien varias filas',
-          datos: '',
-          esperado: '', obtenido: '' }
+        { objeto: 'registrar_entrega', prueba: 'Datos inválidos (P2 a P5)',
+          datos: 'Razón inventada, sin razón, ENTREGADO, pedido 999',
+          esperado: 'Un error por caso; nada cambia', obtenido: '' },
+        { objeto: 'las dos funciones', prueba: 'Con y sin parámetros (P6, P7)',
+          datos: 'Todas las rutas; desde DUAL',
+          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3', obtenido: '' },
+        { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa solo si cambia (P8, P9)',
+          datos: 'Después de P1; UPDATE de foto_url',
+          esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: '' },
+        { objeto: 'trg_contar_fallidas', prueba: 'Sentencia: una vez por UPDATE (P10)',
+          datos: 'Un UPDATE de los pedidos 2 y 3',
+          esperado: '1 línea impresa y 2 avisos nuevos', obtenido: '' },
+        { objeto: 'cerrar_rutas_completas', prueba: 'Cierra rutas terminadas (P11-P13)',
+          datos: 'Antes y después de entregar 2 y 3',
+          esperado: 'Cierra 0, luego 1, luego 0', obtenido: '' }
       ],
       preguntas: [
         '170. Muestre una prueba que permita comprobar el funcionamiento de uno de sus objetos.',
