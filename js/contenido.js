@@ -29,76 +29,6 @@ window.PRESENTACION = {
       bajada: 'Procedimientos, funciones, packages y triggers de la App de Gestión de Reparto.'
     },
 
-    /* ---------- 2. Animación: la nave que cayó ----------
-       El código y el error que aparecen en la pantalla de la nave
-       están en js/codigos.js (claves caida_sql y caida_error). */
-    {
-      id: 'mision',
-      tipo: 'caida',
-      seccion: 'Bitácora del capitán',
-      titulo: 'El día que la nave cayó',
-      final: {
-        titulo: 'Misión abortada',
-        error: 'ORA-04091: la tabla FACTURA está mutando',
-        parrafos: [
-          'El trigger es FOR EACH ROW y consulta factura, la misma tabla que lo disparó. Oracle no deja leerla mientras el UPDATE la está cambiando.',
-          'Cómo se evita: hacer el conteo en un trigger de sentencia, que corre cuando el UPDATE ya terminó. Por eso trg_notificar_entrega solo inserta en notificacion y nunca lee factura.'
-        ],
-        ir: 'mision-ok',
-        irTexto: 'Ver la corrección'
-      },
-      preguntas: [
-        '96. ¿Qué es una tabla mutante y en qué circunstancias puede aparecer ese problema?',
-        '97. ¿Cómo podríamos evitar una implementación que produzca errores de tabla mutante?',
-        '116. ¿Qué mensaje de error obtuvimos y qué significaba?',
-        '95. ¿Qué ocurriría si una operación activara indirectamente otros triggers?'
-      ]
-    },
-
-    /* ---------- 3. Animación: la corrección ----------
-       Código y salida en js/codigos.js (claves correccion_sql y correccion_salida). */
-    {
-      id: 'mision-ok',
-      tipo: 'caida',
-      modo: 'exito',
-      codigo: 'correccion_sql',
-      salida: 'correccion_salida',
-      seccion: 'Bitácora del capitán',
-      titulo: 'La corrección: misión cumplida',
-      final: {
-        titulo: 'Misión cumplida',
-        error: 'Sin FOR EACH ROW: trigger de sentencia',
-        parrafos: [
-          'Quitamos FOR EACH ROW. Ahora el trigger se dispara una sola vez, cuando el UPDATE ya terminó, y en ese momento sí puede consultar factura.',
-          'Lo que se pierde: un trigger de sentencia no ve :OLD ni :NEW, así que no sabe qué pedido cambió. Si se necesitara, habría que usar un COMPOUND TRIGGER.'
-        ],
-        ir: 'mision',
-        irTexto: 'Ver el error otra vez'
-      },
-      preguntas: [
-        '169. ¿Qué diferencia habría si ese trigger fuera a nivel de sentencia en lugar de fila, o viceversa?',
-        '97. ¿Cómo podríamos evitar una implementación que produzca errores de tabla mutante?',
-        '174. ¿Cómo supo que la solución propuesta por la IA era correcta?',
-        '89. ¿Qué información puede consultar un trigger a nivel de fila mediante los valores :OLD y :NEW?'
-      ]
-    },
-
-    /* ---------- 4. Plan de vuelo ---------- */
-    {
-      id: 'plan',
-      tipo: 'ruta',
-      seccion: 'Plan de vuelo',
-      titulo: 'Seis paradas antes de aterrizar',
-      paradas: [
-        { nombre: 'El caso', detalle: 'Qué problema tiene el reparto y qué resolvemos.', ir: 'caso' },
-        { nombre: 'Procedimientos', detalle: 'Con y sin parámetros.', ir: 'proc-concepto' },
-        { nombre: 'Funciones', detalle: 'Con y sin parámetros, y su uso en un SELECT.', ir: 'func-concepto' },
-        { nombre: 'Package', detalle: 'Qué es público y qué queda privado.', ir: 'pkg-demo' },
-        { nombre: 'Triggers', detalle: 'A nivel de fila y a nivel de sentencia.', ir: 'trg-demo' },
-        { nombre: 'Pruebas y bitácora de IA', detalle: 'Qué comprobamos y cómo trabajamos con la IA.', ir: 'pruebas' }
-      ]
-    },
-
     /* ---------- 3. El caso ---------- */
     {
       id: 'caso',
@@ -116,6 +46,22 @@ window.PRESENTACION = {
         '5. ¿Qué reglas de negocio deben respetarse?',
         '9. ¿Qué parte del problema no se resuelve simplemente mediante una consulta SQL?',
         '161. Explique el problema de negocio y la solución desarrollada por su equipo.'
+      ]
+    },
+
+    /* ---------- 4. Plan de vuelo ---------- */
+    {
+      id: 'plan',
+      tipo: 'ruta',
+      seccion: 'Plan de vuelo',
+      titulo: 'Seis paradas antes de aterrizar',
+      paradas: [
+        { nombre: 'El caso', detalle: 'Qué problema tiene el reparto y qué resolvemos.', ir: 'caso' },
+        { nombre: 'Procedimientos', detalle: 'Con y sin parámetros.', ir: 'proc-concepto' },
+        { nombre: 'Funciones', detalle: 'Con y sin parámetros, y su uso en un SELECT.', ir: 'func-concepto' },
+        { nombre: 'Package', detalle: 'Qué es público y qué queda privado.', ir: 'pkg-demo' },
+        { nombre: 'Triggers', detalle: 'A nivel de fila y a nivel de sentencia.', ir: 'trg-demo' },
+        { nombre: 'Pruebas y bitácora de IA', detalle: 'Qué comprobamos y cómo trabajamos con la IA.', ir: 'pruebas' }
       ]
     },
 
@@ -416,6 +362,60 @@ window.PRESENTACION = {
         '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?',
         '99. ¿Por qué elegimos utilizar un trigger y no otra alternativa?',
         '100. ¿Qué pruebas realizamos para comprobar que el trigger no se activa en situaciones incorrectas?'
+      ]
+    },
+
+    /* ---------- 2. Animación: la nave que cayó ----------
+       El código y el error que aparecen en la pantalla de la nave
+       están en js/codigos.js (claves caida_sql y caida_error). */
+    {
+      id: 'mision',
+      tipo: 'caida',
+      seccion: 'Bitácora del capitán',
+      titulo: 'El día que la nave cayó',
+      final: {
+        titulo: 'Misión abortada',
+        error: 'ORA-04091: la tabla FACTURA está mutando',
+        parrafos: [
+          'El trigger es FOR EACH ROW y consulta factura, la misma tabla que lo disparó. Oracle no deja leerla mientras el UPDATE la está cambiando.',
+          'Cómo se evita: hacer el conteo en un trigger de sentencia, que corre cuando el UPDATE ya terminó. Por eso trg_notificar_entrega solo inserta en notificacion y nunca lee factura.'
+        ],
+        ir: 'mision-ok',
+        irTexto: 'Ver la corrección'
+      },
+      preguntas: [
+        '96. ¿Qué es una tabla mutante y en qué circunstancias puede aparecer ese problema?',
+        '97. ¿Cómo podríamos evitar una implementación que produzca errores de tabla mutante?',
+        '116. ¿Qué mensaje de error obtuvimos y qué significaba?',
+        '95. ¿Qué ocurriría si una operación activara indirectamente otros triggers?'
+      ]
+    },
+
+    /* ---------- 3. Animación: la corrección ----------
+       Código y salida en js/codigos.js (claves correccion_sql y correccion_salida). */
+    {
+      id: 'mision-ok',
+      tipo: 'caida',
+      modo: 'exito',
+      codigo: 'correccion_sql',
+      salida: 'correccion_salida',
+      seccion: 'Bitácora del capitán',
+      titulo: 'La corrección: misión cumplida',
+      final: {
+        titulo: 'Misión cumplida',
+        error: 'Sin FOR EACH ROW: trigger de sentencia',
+        parrafos: [
+          'Quitamos FOR EACH ROW. Ahora el trigger se dispara una sola vez, cuando el UPDATE ya terminó, y en ese momento sí puede consultar factura.',
+          'Lo que se pierde: un trigger de sentencia no ve :OLD ni :NEW, así que no sabe qué pedido cambió. Si se necesitara, habría que usar un COMPOUND TRIGGER.'
+        ],
+        ir: 'mision',
+        irTexto: 'Ver el error otra vez'
+      },
+      preguntas: [
+        '169. ¿Qué diferencia habría si ese trigger fuera a nivel de sentencia en lugar de fila, o viceversa?',
+        '97. ¿Cómo podríamos evitar una implementación que produzca errores de tabla mutante?',
+        '174. ¿Cómo supo que la solución propuesta por la IA era correcta?',
+        '89. ¿Qué información puede consultar un trigger a nivel de fila mediante los valores :OLD y :NEW?'
       ]
     },
 

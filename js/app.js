@@ -652,6 +652,7 @@
                 <ellipse class="boca-susto" cx="458" cy="526" rx="13" ry="17" fill="#150F36"/>
                 <path class="gota" d="M318 392 C310 408 306 418 318 422 C330 418 326 408 318 392 Z" fill="#BFF3F0"/>
               </g>
+              <text class="nombre-alien" x="400" y="206">Carlitos</text>
               <text class="sustos" x="520" y="330">!!</text>
               <path class="visto" d="M520 300 L548 330 L600 262" stroke="#D4F56A" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <g class="brazo">
@@ -854,6 +855,7 @@
                 <path d="M752 352 C744 320 736 300 726 284" stroke="#7BC94E" stroke-width="6" fill="none" stroke-linecap="round"/>
                 <path d="M796 350 C806 318 818 298 832 284" stroke="#7BC94E" stroke-width="6" fill="none" stroke-linecap="round"/>
                 <circle cx="724" cy="280" r="11" fill="#D4F56A"/><circle cx="834" cy="280" r="11" fill="#D4F56A"/>
+                <text class="nombre-alien" x="778" y="246">Carlitos</text>
                 <ellipse cx="776" cy="418" rx="74" ry="84" fill="#8FE05A"/>
                 <ellipse cx="808" cy="410" rx="15" ry="25" fill="#150F36" transform="rotate(-20 808 410)"/>
                 <ellipse cx="840" cy="404" rx="11" ry="21" fill="#150F36" transform="rotate(-20 840 404)"/>

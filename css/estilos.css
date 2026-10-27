@@ -617,3 +617,6 @@ ul, ol { padding: 0; list-style: none; }
 /* tarjeta final del modo éxito */
 .modo-exito .tarjeta-mision { width: 540px; left: 60px; }
 .modo-exito .tarjeta-mision .tarjeta-error { color: #2F6B3A; }
+
+/* Nombre del alien (Carlitos) sobre su cabeza */
+.nombre-alien { font-family: var(--rotulo); font-size: 34px; fill: #D4F56A; text-anchor: middle; paint-order: stroke; stroke: #150F36; stroke-width: 6px; stroke-linejoin: round; }
