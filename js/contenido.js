@@ -77,7 +77,7 @@ window.PRESENTACION = {
           pasos: [
             { tipo: 'Quién', nombre: 'Repartidor', que: 'marca la entrega en la app' },
             { tipo: 'Procedimiento', nombre: 'registrar_entrega', que: 'valida y actualiza pedido y factura' },
-            { tipo: 'Trigger de fila', nombre: 'trg_notificar_entrega', que: 'se dispara al cambiar el resultado' },
+            { tipo: 'Trigger de fila', nombre: 'trg_notificar_entrega', que: 'se dispara al actualizar resultado_entrega' },
             { tipo: 'Tabla', nombre: 'notificacion', que: 'queda el aviso al cliente' }
           ]
         },
@@ -370,7 +370,7 @@ window.PRESENTACION = {
       titulo: 'trg_notificar_entrega, a nivel de fila',
       resumen: [
         'Evento: después de actualizar resultado_entrega en la tabla factura.',
-        'FOR EACH ROW: crea una notificación por cada factura que cambia.',
+        'FOR EACH ROW: crea una notificación por cada factura cuyo resultado_entrega se actualiza.',
         ':NEW.id_pedido trae el valor recién guardado en esa fila.',
         'WHEN filtra: solo actúa si el resultado no quedó nulo.',
         'Va en la misma transacción: si el INSERT falla, también se deshace la entrega.'
@@ -483,7 +483,7 @@ window.PRESENTACION = {
         { objeto: 'las dos funciones', prueba: 'Con y sin parámetros (P6, P7)',
           datos: 'Todas las rutas; desde DUAL',
           esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3', obtenido: '' },
-        { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa solo si cambia (P8, P9)',
+        { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa si se actualiza resultado_entrega, no otra columna (P8, P9)',
           datos: 'Después de P1; UPDATE de foto_url',
           esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: '' },
         { objeto: 'trg_contar_fallidas', prueba: 'Sentencia: una vez por UPDATE (P10)',
