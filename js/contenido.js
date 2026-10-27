@@ -476,22 +476,22 @@ window.PRESENTACION = {
       filas: [
         { objeto: 'registrar_entrega', prueba: 'Fallida con razón del catálogo (P1)',
           datos: "Pedido 1, 'FALLIDO', 'CLIENTE_AUSENTE'",
-          esperado: 'Entrega registrada correctamente', obtenido: '' },
+          esperado: 'Entrega registrada correctamente', obtenido: 'Entregas fallidas: 1, luego "Entrega registrada correctamente". Igual al esperado.' },
         { objeto: 'registrar_entrega', prueba: 'Datos inválidos (P2 a P5)',
           datos: 'Razón inventada, sin razón, ENTREGADO, pedido 999',
-          esperado: 'Un error por caso; nada cambia', obtenido: '' },
+          esperado: 'Un error por caso; nada cambia', obtenido: 'Los 4 mensajes salieron como se esperaba. La comprobación de estados queda por confirmar.' },
         { objeto: 'las dos funciones', prueba: 'Con y sin parámetros (P6, P7)',
           datos: 'Todas las rutas; desde DUAL',
-          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3', obtenido: '' },
+          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3', obtenido: 'Pendiente: revisar el resultado de la consulta.' },
         { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa si se actualiza resultado_entrega, no otra columna (P8, P9)',
           datos: 'Después de P1; UPDATE de foto_url',
-          esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: '' },
+          esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: 'El UPDATE de foto_url no imprime nada del trigger de sentencia. El conteo de avisos queda pendiente.' },
         { objeto: 'trg_contar_fallidas', prueba: 'Sentencia: una vez por UPDATE (P10)',
           datos: 'Un UPDATE de los pedidos 2 y 3',
-          esperado: '1 línea impresa y 2 avisos nuevos', obtenido: '' },
+          esperado: '1 línea impresa y 2 avisos nuevos', obtenido: '2 filas actualizadas y una sola línea "Entregas fallidas: 1". Los avisos nuevos quedan pendientes.' },
         { objeto: 'cerrar_rutas_completas', prueba: 'Cierra rutas terminadas (P11-P13)',
           datos: 'Antes y después de entregar 2 y 3',
-          esperado: 'Cierra 0, luego 1, luego 0', obtenido: '' }
+          esperado: 'Cierra 0, luego 1, luego 0', obtenido: 'Rutas cerradas: 0, luego 1, luego 0. Igual al esperado.' }
       ],
       preguntas: [
         '170. Muestre una prueba que permita comprobar el funcionamiento de uno de sus objetos.',
