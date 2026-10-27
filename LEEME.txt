@@ -50,11 +50,16 @@ QUÉ ARCHIVO SE EDITA
 
 Después de editar: guardar y recargar con F5.
 
+EL SQL PARA EJECUTAR (carpeta sql)
+  En SQL Developer, sobre un esquema vacío y en este orden (F5, Run Script):
+    1_base_datos.sql              las tablas (copia del repo TallerBD)
+    2_pkg_reparto_y_triggers.sql  el package completo y los dos triggers
+    3_datos_y_pruebas.sql         datos de prueba y las pruebas P1 a P14
+  Cada prueba dice qué se espera. Lo que salga de verdad va en la columna
+  "Se obtuvo" de la lámina de pruebas (js/contenido.js, id 'pruebas').
+  Si cambian el SQL, copien el mismo cambio a js/codigos.js.
+
 QUÉ FALTA (también se ve con la tecla G)
-  - Procedimiento sin parámetros y su ejecución
-  - Función sin parámetros y su consulta
-  - Trigger a nivel de sentencia y su prueba
-  - Consulta que comprueba el trigger de fila
-  - Columna "Se obtuvo" de la tabla de pruebas (ejecutar en SQL Developer)
+  - Ejecutar sql/ en SQL Developer y llenar la columna "Se obtuvo"
   - Las 4 evidencias de IA, con casos que hayan pasado de verdad
   - Límites, mejoras y aprendizaje en las conclusiones

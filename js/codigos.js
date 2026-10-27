@@ -77,7 +77,9 @@ Entregas fallidas: 1
 
   /* ---------- PROCEDIMIENTOS ---------- */
 
-  // Procedimiento CON parámetros (copiado del repo TallerBD, archivo 2).
+  // Procedimiento CON parámetros. Viene del repo TallerBD (archivo 2), con dos cambios:
+  // valida que el resultado sea LOGRADO o FALLIDO y WHEN OTHERS ya no relanza.
+  // El código completo y ejecutable está en sql/2_pkg_reparto_y_triggers.sql.
   proc_registrar_entrega: String.raw`
 PROCEDURE registrar_entrega(
     p_id_pedido   IN  NUMBER,
@@ -85,30 +87,30 @@ PROCEDURE registrar_entrega(
     p_razon       IN  VARCHAR2 DEFAULT NULL,
     p_mensaje     OUT VARCHAR2
 ) IS
-    v_razon_valida  BOOLEAN := FALSE;
+    v_resultado  VARCHAR2(4000);
 BEGIN
-    -- Regla de negocio: si es FALLIDO, la razón es obligatoria.
-    IF p_resultado = 'FALLIDO' AND p_razon IS NULL THEN
-        RAISE_APPLICATION_ERROR(-20001, 'Debe indicar razon de fallo en la entrega');
+    -- Se normaliza aquí y no en la declaración: un error en la
+    -- declaración no lo atraparía el EXCEPTION de abajo.
+    v_resultado := UPPER(TRIM(p_resultado));
+
+    -- Regla de negocio: solo hay dos resultados posibles.
+    IF v_resultado IS NULL OR v_resultado NOT IN ('LOGRADO', 'FALLIDO') THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Resultado de entrega no valido');
     END IF;
 
-    -- Regla de negocio (usa el VARRAY): la razón debe existir en el
-    -- catálogo. FOR i IN 1..COUNT recorre solo los elementos
-    -- realmente llenos (el VARRAY es de longitud variable).
-    IF p_resultado = 'FALLIDO' THEN
-        FOR i IN 1..v_razones_fallo.COUNT LOOP
-            IF UPPER(v_razones_fallo(i)) = UPPER(p_razon) THEN
-                v_razon_valida := TRUE;
-                EXIT;
-            END IF;
-        END LOOP;
-        IF NOT v_razon_valida THEN
+    -- Regla de negocio: si es FALLIDO, la razón es obligatoria
+    -- y tiene que estar en el catálogo (función privada).
+    IF v_resultado = 'FALLIDO' THEN
+        IF p_razon IS NULL THEN
+            RAISE_APPLICATION_ERROR(-20001, 'Debe indicar razon de fallo en la entrega');
+        END IF;
+        IF NOT es_razon_valida(p_razon) THEN
             RAISE_APPLICATION_ERROR(-20002, 'Razon de fallo no permitida');
         END IF;
     END IF;
 
     UPDATE pedido
-    SET id_estado_pedido = CASE WHEN p_resultado = 'LOGRADO' THEN 3 ELSE 4 END
+    SET id_estado_pedido = CASE WHEN v_resultado = 'LOGRADO' THEN 3 ELSE 4 END
     WHERE id_pedido = p_id_pedido;
 
     -- Si no actualizó ninguna fila, el pedido no existe.
@@ -116,9 +118,10 @@ BEGIN
         RAISE NO_DATA_FOUND;
     END IF;
 
+    -- Una entrega lograda no guarda razón de fallo.
     UPDATE factura
-    SET resultado_entrega = p_resultado,
-        razon_fallo = p_razon,
+    SET resultado_entrega = v_resultado,
+        razon_fallo = CASE WHEN v_resultado = 'FALLIDO' THEN UPPER(TRIM(p_razon)) END,
         fecha_entrega = SYSDATE
     WHERE id_pedido = p_id_pedido;
 
@@ -130,19 +133,21 @@ EXCEPTION
     WHEN NO_DATA_FOUND THEN
         ROLLBACK;
         p_mensaje := 'Pedido no encontrado';
-    -- Excepción PERSONALIZADA (regla de negocio).
+    -- Excepciones PERSONALIZADAS (reglas de negocio).
+    WHEN e_resultado_no_valido THEN
+        ROLLBACK;
+        p_mensaje := 'Error: resultado de entrega no valido';
     WHEN e_razon_obligatoria THEN
         ROLLBACK;
         p_mensaje := 'Error: razon de fallo obligatoria';
-    -- Excepción PERSONALIZADA (regla de negocio, usa el VARRAY).
     WHEN e_razon_no_valida THEN
         ROLLBACK;
         p_mensaje := 'Error: razon de fallo no permitida';
-    -- Red de seguridad para cualquier otro error no previsto.
+    -- Red de seguridad. No se relanza: si se relanzara, el
+    -- parámetro OUT no le llegaría a quien llamó.
     WHEN OTHERS THEN
         ROLLBACK;
         p_mensaje := 'Error inesperado: '||SQLCODE||' - '||SQLERRM;
-        RAISE;
 END registrar_entrega;
 `,
 
@@ -157,12 +162,51 @@ END;
 /
 `,
 
-  // PENDIENTE — procedimiento SIN parámetros (lo exige el punto 1 de la pauta).
+  // Procedimiento SIN parámetros (punto 1 de la pauta).
   proc_sin_parametros: String.raw`
+-- Sin parámetros: siempre revisa TODAS las rutas.
+-- Cierra (3 = FINALIZADA) cada ruta EN_CURSO (2) que tiene pedidos
+-- y ya no le queda ninguno CREADO (1) ni EN_RUTA (2).
+PROCEDURE cerrar_rutas_completas IS
+    v_cerradas NUMBER;
+BEGIN
+    UPDATE ruta r
+    SET r.id_estado_ruta = 3
+    WHERE r.id_estado_ruta = 2
+      AND EXISTS (SELECT 1 FROM pedido p
+                  WHERE p.id_ruta = r.id_ruta)
+      AND NOT EXISTS (SELECT 1 FROM pedido p
+                      WHERE p.id_ruta = r.id_ruta
+                        AND p.id_estado_pedido IN (1, 2));
+
+    v_cerradas := SQL%ROWCOUNT;
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Rutas cerradas: ' || v_cerradas);
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END cerrar_rutas_completas;
 `,
 
-  // PENDIENTE — cómo se ejecuta el procedimiento sin parámetros.
+  // Cómo se ejecuta el procedimiento sin parámetros.
   uso_proc_sin_parametros: String.raw`
+SET SERVEROUTPUT ON
+
+-- Sin paréntesis ni argumentos.
+BEGIN
+    pkg_reparto.cerrar_rutas_completas;
+END;
+/
+-- En SQL Developer también sirve:
+-- EXEC pkg_reparto.cerrar_rutas_completas;
+
+-- Comprobación: qué rutas quedaron FINALIZADA.
+SELECT r.id_ruta, e.nombre_estado
+FROM ruta r
+JOIN estado_ruta e ON e.id_estado_ruta = r.id_estado_ruta;
+
+-- Ejecutarlo otra vez imprime "Rutas cerradas: 0".
 `,
 
   /* ---------- FUNCIONES ---------- */
@@ -193,22 +237,41 @@ SELECT id_ruta,
 FROM ruta;
 `,
 
-  // PENDIENTE — función SIN parámetros (lo exige el punto 2 de la pauta).
+  // Función SIN parámetros (punto 2 de la pauta).
   func_sin_parametros: String.raw`
+-- Sin parámetros: el resultado no depende de ninguna entrada.
+-- Cuántos pedidos siguen EN_RUTA (2) ahora, en todas las rutas.
+FUNCTION total_pedidos_en_ruta RETURN NUMBER IS
+    v_total NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_total
+    FROM pedido
+    WHERE id_estado_pedido = 2;
+
+    RETURN v_total;
+END total_pedidos_en_ruta;
 `,
 
-  // PENDIENTE — consulta que usa la función sin parámetros.
+  // Consulta que usa la función sin parámetros.
   uso_func_sin_parametros: String.raw`
+-- Como no recibe nada, se consulta desde DUAL.
+SELECT pkg_reparto.total_pedidos_en_ruta AS en_ruta
+FROM dual;
+
+-- Comprobación a mano: tiene que dar el mismo número.
+SELECT COUNT(*) AS en_ruta_a_mano
+FROM pedido
+WHERE id_estado_pedido = 2;
 `,
 
   /* ---------- PACKAGE ---------- */
 
-  // Especificación: lo público (copiada del repo TallerBD, archivo 2).
+  // Especificación: lo público (TallerBD, archivo 2, más los dos objetos sin parámetros).
   pkg_especificacion: String.raw`
 CREATE OR REPLACE PACKAGE pkg_reparto IS
 
-    -- RECORD: agrupa en una sola variable los campos de un
-    -- pedido + su cliente + su estado (viene de un JOIN).
+    -- RECORD: pedido + cliente + estado (viene de un JOIN).
     TYPE r_pedido_detalle IS RECORD (
         id_pedido        pedido.id_pedido%TYPE,
         cliente_nombre   cliente.nombre%TYPE,
@@ -216,8 +279,7 @@ CREATE OR REPLACE PACKAGE pkg_reparto IS
         fecha_creacion   pedido.fecha_creacion%TYPE
     );
 
-    -- Procedimiento: ejecuta una ACCIÓN (no retorna valor).
-    -- IN = datos que entran, OUT = mensaje de resultado que sale.
+    -- Procedimiento CON parámetros: registra una entrega.
     PROCEDURE registrar_entrega(
         p_id_pedido   IN  NUMBER,
         p_resultado   IN  VARCHAR2,
@@ -225,36 +287,64 @@ CREATE OR REPLACE PACKAGE pkg_reparto IS
         p_mensaje     OUT VARCHAR2
     );
 
-    -- Función: SIEMPRE retorna un valor, se puede usar en un SELECT.
+    -- Procedimiento SIN parámetros: cierra rutas terminadas.
+    PROCEDURE cerrar_rutas_completas;
+
+    -- Función CON parámetros: fallidos de una ruta.
     FUNCTION contar_pedidos_fallidos(p_id_ruta IN NUMBER) RETURN NUMBER;
 
-    -- Procedimiento con cursor complejo + RECORD (ejemplo de uso).
+    -- Función SIN parámetros: pedidos que siguen en ruta.
+    FUNCTION total_pedidos_en_ruta RETURN NUMBER;
+
+    -- Procedimiento con cursor complejo + RECORD.
     PROCEDURE listar_pedidos_por_ruta(p_id_ruta IN NUMBER);
 
 END pkg_reparto;
 `,
 
-  // Inicio del cuerpo: los elementos privados (copiado del repo TallerBD, archivo 2).
+  // Inicio del cuerpo: los elementos privados (TallerBD, archivo 2, más la excepción -20003).
   pkg_privados: String.raw`
 CREATE OR REPLACE PACKAGE BODY pkg_reparto IS
 
-    -- Excepción PERSONALIZADA: no es un error de Oracle, es una
-    -- regla de negocio nuestra ("toda entrega fallida necesita razón").
+    -- Excepciones PERSONALIZADAS: reglas de negocio nuestras.
     e_razon_obligatoria EXCEPTION;
     PRAGMA EXCEPTION_INIT(e_razon_obligatoria, -20001);
 
-    -- Segunda excepción personalizada: la razón no está en el catálogo.
     e_razon_no_valida EXCEPTION;
     PRAGMA EXCEPTION_INIT(e_razon_no_valida, -20002);
 
-    -- Uso del VARRAY t_razones_fallo (tipo definido en el archivo 1):
-    -- catálogo FIJO y acotado (máx. 10) de razones de fallo válidas.
-    -- Se recorre con COUNT para validar la razón que escribe el operario.
+    e_resultado_no_valido EXCEPTION;
+    PRAGMA EXCEPTION_INIT(e_resultado_no_valido, -20003);
+
+    -- VARRAY t_razones_fallo (tipo del archivo 1): catálogo FIJO
+    -- y acotado (máx. 10) de razones de fallo válidas.
     v_razones_fallo t_razones_fallo := t_razones_fallo(
         'CLIENTE_AUSENTE', 'DIRECCION_INCORRECTA', 'RECHAZADO_POR_CLIENTE',
-        'DOMICILIO_CERRADO', 'NO_CONCERTADA', 'VEHICULO_AVEARIADO',
+        'DOMICILIO_CERRADO', 'NO_CONCERTADA', 'VEHICULO_AVERIADO',
         'FALTA_MERCADERIA', 'PRODUCTO_DANADO'
     );
+`,
+
+  // La función privada del cuerpo.
+  pkg_func_privada: String.raw`
+    -- Función PRIVADA: no está en la especificación.
+    -- Solo la usa registrar_entrega. Devuelve BOOLEAN, que SQL
+    -- no entiende, así que tampoco tendría sentido exponerla.
+    -- Va antes de registrar_entrega porque esa la llama.
+    FUNCTION es_razon_valida(p_razon IN VARCHAR2) RETURN BOOLEAN IS
+    BEGIN
+        -- FOR i IN 1..COUNT recorre solo los elementos llenos.
+        FOR i IN 1..v_razones_fallo.COUNT LOOP
+            IF v_razones_fallo(i) = UPPER(TRIM(p_razon)) THEN
+                RETURN TRUE;
+            END IF;
+        END LOOP;
+        RETURN FALSE;
+    END es_razon_valida;
+
+    -- Desde fuera del package:
+    --   pkg_reparto.es_razon_valida('CLIENTE_AUSENTE')
+    --   PLS-00302: component 'ES_RAZON_VALIDA' must be declared
 `,
 
   /* ---------- TRIGGERS ---------- */
@@ -272,16 +362,65 @@ END;
 /
 `,
 
-  // PENDIENTE — consulta que demuestra que el trigger de fila creó la notificación.
+  // Consultas que demuestran que el trigger de fila creó la notificación, y cuándo no.
   uso_trg_notificar_entrega: String.raw`
+-- 1. Se registra la entrega con el procedimiento.
+--    Nadie llama al trigger: lo dispara el UPDATE de factura.
+DECLARE
+    v_msg VARCHAR2(200);
+BEGIN
+    pkg_reparto.registrar_entrega(1, 'FALLIDO', 'CLIENTE_AUSENTE', v_msg);
+    DBMS_OUTPUT.PUT_LINE(v_msg);
+END;
+/
+
+-- 2. Apareció la notificación: pedido 1, EMAIL, fecha de hoy.
+SELECT id_notificacion, id_pedido, tipo, fecha_envio
+FROM notificacion
+WHERE id_pedido = 1;
+
+-- 3. Si cambia OTRA columna, no se dispara (AFTER UPDATE OF).
+UPDATE factura SET foto_url = 'foto.jpg' WHERE id_pedido = 4;
+SELECT COUNT(*) FROM notificacion WHERE id_pedido = 4;  -- sigue en 0
+ROLLBACK;
 `,
 
-  // PENDIENTE — trigger a nivel de SENTENCIA (lo exige el punto 4 de la pauta).
+  // Trigger a nivel de SENTENCIA (punto 4 de la pauta): el de la animación de la corrección.
   trg_sentencia: String.raw`
+-- El mismo trigger de la nave, ya corregido.
+-- Sin FOR EACH ROW: se dispara UNA vez por sentencia, cuando el
+-- UPDATE ya terminó. Por eso sí puede leer factura.
+CREATE OR REPLACE TRIGGER trg_contar_fallidas
+AFTER UPDATE OF resultado_entrega ON factura
+DECLARE
+    v_fallidas NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_fallidas
+    FROM factura
+    WHERE resultado_entrega = 'FALLIDO';
+    DBMS_OUTPUT.PUT_LINE('Entregas fallidas: ' || v_fallidas);
+END;
+/
 `,
 
-  // PENDIENTE — prueba que demuestra que dispara una sola vez por sentencia.
+  // Prueba que demuestra que dispara una sola vez por sentencia.
   uso_trg_sentencia: String.raw`
+SET SERVEROUTPUT ON
+
+-- UNA sentencia que cambia DOS facturas.
+UPDATE factura
+SET resultado_entrega = 'LOGRADO'
+WHERE id_pedido IN (2, 3);
+
+-- Salida esperada:
+--   2 rows updated.
+--   Entregas fallidas: 1     <- una sola línea: sentencia, 1 vez
+
+-- El de fila, en cambio, corrió dos veces:
+SELECT id_pedido, tipo FROM notificacion
+WHERE id_pedido IN (2, 3);          -- 2 filas
+
+ROLLBACK;  -- fue solo una prueba
 `,
 
 };
