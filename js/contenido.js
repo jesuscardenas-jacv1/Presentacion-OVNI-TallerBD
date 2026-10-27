@@ -485,13 +485,13 @@ window.PRESENTACION = {
           esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3 (antes de P12)', obtenido: 'Ruta 1: 1, ruta 2: 0. En ruta: 1 al final del script, porque P12 ya dejó los pedidos 2 y 3 como ENTREGADO. El 3 corresponde a antes de P12.' },
         { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa si se actualiza resultado_entrega, no otra columna (P8, P9)',
           datos: 'Después de P1; UPDATE de foto_url',
-          esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: 'El UPDATE de foto_url no imprime nada del trigger de sentencia. El conteo de avisos queda pendiente.' },
+          esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: 'P8: quedaron 3 avisos, uno por pedido 1, 2 y 3. Los ids 2 y 3 quedaron libres por el ROLLBACK de P10. P9: el conteo de avisos del pedido 4 queda pendiente.' },
         { objeto: 'trg_contar_fallidas', prueba: 'Sentencia: una vez por UPDATE (P10)',
           datos: 'Un UPDATE de los pedidos 2 y 3',
-          esperado: '1 línea impresa y 2 avisos nuevos', obtenido: '2 filas actualizadas y una sola línea "Entregas fallidas: 1". Los avisos nuevos quedan pendientes.' },
+          esperado: '1 línea impresa y 2 avisos nuevos', obtenido: '2 filas actualizadas y una sola línea "Entregas fallidas: 1". Los avisos nuevos quedan pendientes de confirmar.' },
         { objeto: 'cerrar_rutas_completas', prueba: 'Cierra rutas terminadas (P11-P13)',
           datos: 'Antes y después de entregar 2 y 3',
-          esperado: 'Cierra 0, luego 1, luego 0', obtenido: 'Rutas cerradas: 0, luego 1, luego 0. Igual al esperado.' }
+          esperado: 'Cierra 0, luego 1, luego 0', obtenido: 'Rutas cerradas: 0, luego 1, luego 0. Al final: ruta 1 FINALIZADA y ruta 2 EN_CURSO. Igual al esperado.' }
       ],
       preguntas: [
         '170. Muestre una prueba que permita comprobar el funcionamiento de uno de sus objetos.',
