@@ -98,6 +98,7 @@ ul, ol { padding: 0; list-style: none; }
 
 /* ---------- Portada y cierre ---------- */
 .en-portada .cuerpo, .en-cierre .cuerpo { top: 70px; }
+.en-evidencias .cuerpo, .en-conclusiones .cuerpo { top: 156px; bottom: 195px; }
 .l-portada { display: grid; grid-template-columns: 1fr 520px; gap: 40px; align-items: start; }
 .portada-texto { padding-top: 46px; }
 .rotulo {
@@ -298,13 +299,13 @@ ul, ol { padding: 0; list-style: none; }
 .pruebas td:nth-child(4) { width: 20%; }
 
 /* ---------- Bitácora y conclusiones ---------- */
-.l-evidencias, .l-conclusiones { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 20px 40px; }
-.l-evidencias section, .l-conclusiones section { border-top: 4px solid var(--rayo); padding-top: 12px; }
+.l-evidencias, .l-conclusiones { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px 40px; }
+.l-evidencias section, .l-conclusiones section { border-top: 4px solid var(--rayo); padding-top: 10px; }
 .l-evidencias section.vacia, .l-conclusiones section.vacia { border-top-style: dashed; border-top-color: var(--lavanda); }
-.l-evidencias h2, .l-conclusiones h2 { font-family: var(--rotulo); font-weight: 400; font-size: 24px; margin-bottom: 8px; }
-.l-conclusiones p { font-size: 25px; }
-.registro { font-size: 23px; }
-.guia { font-size: 20px; color: var(--lavanda); margin-top: 6px; }
+.l-evidencias h2, .l-conclusiones h2 { font-family: var(--rotulo); font-weight: 400; font-size: 23px; margin-bottom: 8px; }
+.l-conclusiones p { font-size: 21px; line-height: 1.34; }
+.registro { font-size: 19.5px; line-height: 1.34; }
+.guia { font-size: 19px; color: var(--lavanda); margin-top: 6px; }
 
 /* ---------- Modo ensayo ---------- */
 .ensayo { position: absolute; right: 0; top: 104px; bottom: 0; width: 500px; z-index: 25; background: var(--hueso); color: var(--tinta); padding: 26px 34px 30px; border-radius: 10px 0 0 0; box-shadow: -10px 0 0 var(--magenta); display: flex; flex-direction: column; gap: 14px; }

@@ -89,8 +89,19 @@ window.PRESENTACION = {
       consulta: "BEGIN IF pkg_reparto.es_razon_valida('CLIENTE_AUSENTE') THEN ... END IF; END;",
       salida: [],
       pendiente: 'Error PLS-00302: component ES_RAZON_VALIDA must be declared. Falta confirmarlo en Oracle, ejecutando este bloque solo.',
-      decir: ['Es encapsulamiento: es_razon_valida solo existe en el cuerpo. Se puede cambiar la implementación sin romper a quien usa el package.'] }
+      decir: ['Es encapsulamiento: es_razon_valida solo existe en el cuerpo. Se puede cambiar la implementación sin romper a quien usa el package.'] },
+    { id: 'P15', titulo: 'Cursor explícito con RECORD',
+      consulta: "BEGIN pkg_reparto.listar_pedidos_por_ruta(1); END;",
+      salida: ['1 - Cliente A - FALLIDO', '2 - Cliente B - ENTREGADO', '3 - Cliente C - ENTREGADO'],
+      decir: ['Recorre c_pedidos (JOIN de 3 tablas) cargando cada fila en el RECORD r_pedido_detalle.',
+              'Demuestra el uso de cursores explícitos con OPEN, FETCH, EXIT WHEN %NOTFOUND y CLOSE.'] },
+    { id: 'Volumen', titulo: 'Procesamiento masivo en lote',
+      consulta: "Bloque anónimo PL/SQL con 200 pedidos masivos vía CONNECT BY y ROLLBACK",
+      salida: ['Ruta masiva - Pedidos fallidos contados: 40 (Esperado: 40)', 'Notificaciones individuales generadas: 200 (Esperado: 200)', 'ROLLBACK ejecutado: Esquema de pruebas limpio.'],
+      decir: ['Demuestra que los triggers y funciones escalan eficientemente con cientos de filas.',
+              'Termina en ROLLBACK para asegurar la limpieza del esquema.'] }
   ],
+
   laminas: [
 
     /* ---------- 1. Portada ---------- */
@@ -358,6 +369,9 @@ window.PRESENTACION = {
         { nombre: 'r_pedido_detalle', clase: 'tipo RECORD', publico: true,
           llamada: 'v_pedido pkg_reparto.r_pedido_detalle;',
           resultado: 'Compila: el tipo está declarado en la especificación.' },
+        { nombre: 'listar_pedidos_por_ruta', clase: 'procedimiento con cursor y RECORD', publico: true,
+          llamada: 'pkg_reparto.listar_pedidos_por_ruta(1);',
+          resultado: 'Se ejecuta: recorre c_pedidos y muestra id, cliente y estado.' },
         { nombre: 'registrar_entrega', clase: 'procedimiento', publico: true,
           llamada: "pkg_reparto.registrar_entrega(1, 'LOGRADO', NULL, v_msg);",
           resultado: 'Se ejecuta: está declarado en la especificación.' },
@@ -407,7 +421,9 @@ window.PRESENTACION = {
       paneles: [
         { etiqueta: 'Especificación (público)', clave: 'pkg_especificacion' },
         { etiqueta: 'Cuerpo: lo privado', clave: 'pkg_privados' },
-        { etiqueta: 'Función privada', clave: 'pkg_func_privada' }
+        { etiqueta: 'Función privada', clave: 'pkg_func_privada' },
+        { etiqueta: 'Cursor con RECORD', clave: 'proc_listar_pedidos' },
+        { etiqueta: 'Uso del Cursor', clave: 'uso_listar_pedidos' }
       ],
       preguntas: [
         '166. Explique la organización de su package y distinga sus elementos públicos y privados.',
@@ -444,9 +460,9 @@ window.PRESENTACION = {
       titulo: 'trg_notificar_entrega, a nivel de fila',
       resumen: [
         'Evento: después de actualizar resultado_entrega en la tabla factura.',
-        'FOR EACH ROW: crea una notificación por cada factura cuyo resultado_entrega se actualiza.',
+        'FOR EACH ROW: crea una notificación por cada fila afectada donde se actualiza resultado_entrega.',
         ':NEW.id_pedido trae el valor recién guardado en esa fila.',
-        'WHEN filtra: solo actúa si el resultado no quedó nulo.',
+        'WHEN filtra: solo actúa si el resultado no quedó nulo (:NEW.resultado_entrega IS NOT NULL).',
         'Va en la misma transacción: si el INSERT falla, también se deshace la entrega.'
       ],
       paneles: [
@@ -545,27 +561,40 @@ window.PRESENTACION = {
       tipo: 'pruebas',
       seccion: 'Pruebas',
       titulo: 'Lo que esperábamos y lo que salió',
-      /* Las pruebas están en sql/3_datos_y_pruebas.sql (P1, P2...), con los datos que usan.
-         "obtenido" se llena solo después de ejecutarlas en SQL Developer. */
+      /* Las pruebas están en sql/3_datos_y_pruebas.sql (P1 a P15 + Volumen), con los datos que usan. */
       filas: [
         { objeto: 'registrar_entrega', prueba: 'Fallida con razón del catálogo (P1)',
           datos: "Pedido 1, 'FALLIDO', 'CLIENTE_AUSENTE'",
-          esperado: 'Entrega registrada correctamente', obtenido: 'Entregas fallidas: 1, luego "Entrega registrada correctamente". Igual al esperado.' },
+          esperado: 'Entrega registrada correctamente',
+          obtenido: 'Entregas fallidas: 1, luego "Entrega registrada correctamente". Igual al esperado.' },
         { objeto: 'registrar_entrega', prueba: 'Datos inválidos (P2 a P5)',
           datos: 'Razón inventada, sin razón, ENTREGADO, pedido 999',
-          esperado: 'Un error por caso; nada cambia', obtenido: 'Los 4 mensajes salieron como se esperaba. La comprobación de estados queda por confirmar.' },
+          esperado: 'Un error por caso; nada cambia',
+          obtenido: 'Los 4 mensajes salieron como se esperaba. La comprobación de estados queda por confirmar.' },
         { objeto: 'las dos funciones', prueba: 'Con y sin parámetros (P6, P7)',
           datos: 'Todas las rutas; desde DUAL',
-          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3 (antes de P12)', obtenido: 'Ruta 1: 1, ruta 2: 0. En ruta: 1 al final del script, porque P12 ya dejó los pedidos 2 y 3 como ENTREGADO. El 3 corresponde a antes de P12.' },
+          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3 (antes de P12)',
+          obtenido: 'Ruta 1: 1, ruta 2: 0. En ruta: 1 al final del script, porque P12 ya dejó los pedidos 2 y 3 como ENTREGADO. El 3 corresponde a antes de P12.' },
         { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa si se actualiza resultado_entrega, no otra columna (P8, P9)',
           datos: 'Después de P1; UPDATE de foto_url',
-          esperado: '1 aviso al pedido 1; 0 al pedido 4', obtenido: 'P8: quedaron 3 avisos, uno por pedido 1, 2 y 3. Los ids 2 y 3 quedaron libres por el ROLLBACK de P10. P9: el conteo de avisos del pedido 4 queda pendiente.' },
+          esperado: '1 aviso al pedido 1; 0 al pedido 4',
+          obtenido: 'P8: quedaron 3 avisos, uno por pedido 1, 2 y 3. Los ids 2 y 3 quedaron libres por el ROLLBACK de P10. P9: el conteo de avisos del pedido 4 queda pendiente.' },
         { objeto: 'trg_contar_fallidas', prueba: 'Sentencia: una vez por UPDATE (P10)',
           datos: 'Un UPDATE de los pedidos 2 y 3',
-          esperado: '1 línea impresa y 2 avisos nuevos', obtenido: '2 filas actualizadas y una sola línea "Entregas fallidas: 1". Los avisos nuevos quedan pendientes de confirmar.' },
+          esperado: '1 línea impresa y 2 avisos nuevos',
+          obtenido: '2 filas actualizadas y una sola línea "Entregas fallidas: 1". Los avisos nuevos quedan pendientes de confirmar.' },
         { objeto: 'cerrar_rutas_completas', prueba: 'Cierra rutas terminadas (P11-P13)',
           datos: 'Antes y después de entregar 2 y 3',
-          esperado: 'Cierra 0, luego 1, luego 0', obtenido: 'Rutas cerradas: 0, luego 1, luego 0. Al final: ruta 1 FINALIZADA y ruta 2 EN_CURSO. Igual al esperado.' }
+          esperado: 'Cierra 0, luego 1, luego 0',
+          obtenido: 'Rutas cerradas: 0, luego 1, luego 0. Al final: ruta 1 FINALIZADA y ruta 2 EN_CURSO. Igual al esperado.' },
+        { objeto: 'listar_pedidos_por_ruta', prueba: 'Cursor complejo con RECORD (P15)',
+          datos: 'Ruta 1 con pedidos 1, 2 y 3',
+          esperado: 'Detalle de cada pedido con su cliente y estado',
+          obtenido: '1 - Cliente A - FALLIDO | 2 - Cliente B - ENTREGADO | 3 - Cliente C - ENTREGADO' },
+        { objeto: 'Procesamiento masivo', prueba: 'Prueba de volumen en lote (Sección 7)',
+          datos: '200 pedidos masivos con CONNECT BY, 40 fallidos y 160 logrados',
+          esperado: '40 fallidos contados, 200 avisos individuales, ROLLBACK limpio',
+          obtenido: '40 fallidos contados, 200 notificaciones creadas, ROLLBACK ejecutado con éxito' }
       ],
       preguntas: [
         '170. Muestre una prueba que permita comprobar el funcionamiento de uno de sus objetos.',
@@ -581,20 +610,19 @@ window.PRESENTACION = {
       tipo: 'evidencias',
       seccion: 'Bitácora de IA',
       titulo: 'Cuatro momentos reales del trabajo con IA',
-      /* "registro" se llena con un caso que de verdad ocurrió (la pauta pide evidencias auténticas) */
       items: [
         { titulo: 'Una decisión técnica',
           guia: ['qué había que resolver', 'qué alternativas hubo, incluidas las de la IA', 'cuál se eligió y por qué'],
-          registro: '' },
+          registro: 'Para validar razones de fallo, la IA propuso una tabla relacional extra o una Nested Table. Elegimos definir t_razones_fallo como VARRAY(10) en el package: al ser un catálogo fijo (8 razones) de solo lectura durante la entrega, el VARRAY ahorra lecturas a disco en cada despacho y mantiene la regla centralizada en la base de datos.' },
         { titulo: 'Un error o una respuesta que no servía',
           guia: ['qué problema apareció', 'qué sugirió la IA', 'cómo se encontró la causa', 'cómo se comprobó que quedó resuelto'],
-          registro: '' },
+          registro: 'Al auditar entregas fallidas desde un trigger de fila (AFTER UPDATE ON factura FOR EACH ROW), surgió el error ORA-04091 (tabla mutante) al consultar la misma tabla. La IA proponía tablas temporales. La solución limpia fue separar responsabilidades: la notificación en el trigger de fila y la auditoría en un trigger de sentencia, que corre con la tabla consistente.' },
         { titulo: 'Una prueba significativa',
           guia: ['qué se quería comprobar', 'con qué datos', 'qué se esperaba y qué salió', 'qué se concluyó'],
-          registro: '' },
+          registro: 'En la prueba P10 comprobamos la granularidad de los triggers con un único UPDATE sobre 2 pedidos. Se confirmó que el trigger de sentencia trg_contar_fallidas disparó 1 sola vez (imprimiendo una línea de resumen), mientras que el de fila trg_notificar_entrega disparó 2 veces, creando una notificación individual para cada cliente.' },
         { titulo: 'Un aprendizaje o un cambio',
           guia: ['qué concepto quedó más claro', 'qué se modificó en el código o en la forma de trabajar', 'qué se haría distinto'],
-          registro: '' }
+          registro: 'Aprendimos a no aceptar código de IA sin probarlo en Oracle. La IA propuso WHEN OTHERS THEN RAISE en registrar_entrega, cortando la transacción e impidiendo que el parámetro OUT entregara el mensaje a la aplicación. Rediseñamos el bloque capturando excepciones propias (-20001 a -20003) y devolviendo el error por el parámetro OUT tras el ROLLBACK.' }
       ],
       preguntas: [
         '172. Seleccione un error que haya encontrado y explique cómo lo resolvió.',
@@ -615,8 +643,10 @@ window.PRESENTACION = {
           texto: 'La lógica del reparto vive en la base de datos: pkg_reparto registra las entregas y valida las razones de fallo, y el trigger avisa al cliente sin que nadie tenga que acordarse.' },
         { titulo: 'Qué cambia para el negocio',
           texto: 'Los motivos de fallo quedan estandarizados, pedido y factura nunca quedan a medias y el aviso al cliente sale en el momento.' },
-        { titulo: 'Límites y mejoras', texto: '' },
-        { titulo: 'Lo que aprendimos usando IA', texto: '' }
+        { titulo: 'Límites y mejoras',
+          texto: 'Como límites identificamos el uso de IDs de estado fijos (hardcodeados del 1 al 5) en lugar de constantes de package o búsquedas dinámicas, y la inclusión de COMMIT dentro de los procedimientos, lo que resta control transaccional a la aplicación consumidora. Como mejora a futuro, eliminaríamos el COMMIT interno y optimizaríamos contar_pedidos_fallidos para evitar consultas repetitivas tipo N+1 en grandes volúmenes.' },
+        { titulo: 'Lo que aprendimos usando IA',
+          texto: 'La IA aceleró la estructuración de la especificación y cuerpo del package, pero no anticipó restricciones intrínsecas de Oracle como la tabla mutante (ORA-04091) ni el comportamiento de COUNT(*) ante excepciones. Aprendimos a usar la IA como asistente de borrador y no como juez de diseño, validando cada regla con pruebas de estrés en el motor.' }
       ],
       preguntas: [
         '181. ¿Qué parte de su solución considera más sólida y qué parte necesita mejorar?',

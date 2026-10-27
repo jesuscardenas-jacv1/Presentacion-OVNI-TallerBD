@@ -231,6 +231,23 @@ END;
 
 
 -- ------------------------------------------------------------
+-- 5.1 listar_pedidos_por_ruta (cursor explícito con RECORD)
+-- ------------------------------------------------------------
+
+-- P15. Lista todos los pedidos de la ruta 1 usando el cursor
+--      con JOIN de 3 tablas y el RECORD r_pedido_detalle.
+-- Esperado:
+--   1 - Cliente A - FALLIDO
+--   2 - Cliente B - ENTREGADO
+--   3 - Cliente C - ENTREGADO
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('--- Detalle de pedidos Ruta 1 ---');
+    pkg_reparto.listar_pedidos_por_ruta(1);
+END;
+/
+
+
+-- ------------------------------------------------------------
 -- 6. Elementos privados del package
 -- ------------------------------------------------------------
 
@@ -244,3 +261,67 @@ END;
 --     END IF;
 -- END;
 -- /
+
+
+-- ------------------------------------------------------------
+-- 7. PRUEBA DE VOLUMEN / PROCESAMIENTO MASIVO
+-- ------------------------------------------------------------
+-- Demuestra el manejo de datos en lote: crea una ruta temporal,
+-- 200 pedidos y 200 facturas vía INSERT ... SELECT, y comprueba
+-- el comportamiento en masa de triggers y funciones de agregación.
+-- Termina con ROLLBACK para dejar el esquema intacto.
+
+DECLARE
+    v_ruta_test  NUMBER;
+    v_fallidos   NUMBER;
+    v_notif      NUMBER;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('=== INICIO PRUEBA DE VOLUMEN (200 REGISTROS) ===');
+
+    -- 1. Crear ruta de prueba
+    INSERT INTO ruta(id_operario, id_vehiculo, fecha, id_estado_ruta)
+    VALUES (1, 1, TRUNC(SYSDATE), 2)
+    RETURNING id_ruta INTO v_ruta_test;
+
+    -- 2. Insertar masivamente 200 pedidos mediante CONNECT BY
+    INSERT INTO pedido(id_cliente, id_ejecutivo, id_ruta, id_estado_pedido)
+    SELECT 1, 3, v_ruta_test, 2
+    FROM dual
+    CONNECT BY LEVEL <= 200;
+
+    -- 3. Crear sus 200 facturas correspondientes
+    INSERT INTO factura(id_pedido, numero_factura)
+    SELECT id_pedido, 'F-VOL-' || id_pedido
+    FROM pedido
+    WHERE id_ruta = v_ruta_test;
+
+    -- 4. Actualización en lote (dispara triggers): 40 fallidos y 160 logrados
+    UPDATE factura
+    SET resultado_entrega = 'FALLIDO', razon_fallo = 'CLIENTE_AUSENTE'
+    WHERE id_pedido IN (
+        SELECT id_pedido FROM pedido WHERE id_ruta = v_ruta_test AND ROWNUM <= 40
+    );
+
+    UPDATE factura
+    SET resultado_entrega = 'LOGRADO'
+    WHERE id_pedido IN (
+        SELECT id_pedido FROM pedido WHERE id_ruta = v_ruta_test
+    ) AND resultado_entrega IS NULL;
+
+    -- 5. Validar función masiva contar_pedidos_fallidos
+    v_fallidos := pkg_reparto.contar_pedidos_fallidos(v_ruta_test);
+    DBMS_OUTPUT.PUT_LINE('Ruta masiva ' || v_ruta_test || ' - Pedidos fallidos contados: ' || v_fallidos || ' (Esperado: 40)');
+
+    -- 6. Validar notificaciones generadas en lote por el trigger de fila
+    SELECT COUNT(*) INTO v_notif
+    FROM notificacion n
+    JOIN pedido p ON p.id_pedido = n.id_pedido
+    WHERE p.id_ruta = v_ruta_test;
+    DBMS_OUTPUT.PUT_LINE('Notificaciones individuales generadas: ' || v_notif || ' (Esperado: 200)');
+
+    -- 7. Reversión para mantener la base de datos limpia
+    ROLLBACK;
+    DBMS_OUTPUT.PUT_LINE('ROLLBACK ejecutado: Esquema de pruebas limpio.');
+    DBMS_OUTPUT.PUT_LINE('=== FIN PRUEBA DE VOLUMEN ===');
+END;
+/

@@ -154,8 +154,8 @@
     template: `
       <div class="paisaje" aria-hidden="true">
         <svg class="cerros" viewBox="0 0 1600 170" preserveAspectRatio="none">
-          <path d="M0 96 L110 74 L250 92 L380 62 L520 90 L700 76 L860 96 L1010 80 L1096 52 L1182 6 L1268 52 L1362 84 L1484 70 L1600 90 L1600 170 L0 170 Z" fill="#2B1557"/>
-          <path d="M1182 6 L1148 30 L1164 27 L1178 39 L1193 27 L1216 30 Z" fill="#F7ECD5" fill-opacity=".9"/>
+          <path d="M0 96 L110 74 L250 92 L380 62 L520 90 L700 76 L860 96 L1010 80 L1096 66 L1182 32 L1268 66 L1362 84 L1484 70 L1600 90 L1600 170 L0 170 Z" fill="#2B1557"/>
+          <path d="M1182 32 L1152 50 L1166 48 L1180 58 L1194 48 L1212 50 Z" fill="#F7ECD5" fill-opacity=".9"/>
           <path d="M0 116 Q400 96 800 112 T1600 106 L1600 170 L0 170 Z" fill="#0D0926"/>
           <rect x="0" y="138" width="1600" height="20" fill="#1C1340"/>
           <line x1="0" y1="148" x2="1600" y2="148" stroke="#F7ECD5" stroke-opacity=".55" stroke-width="2" stroke-dasharray="26 22"/>
@@ -1264,7 +1264,7 @@
       const indice = ref(0);
       const vista = ref('');
       const prueba = ref('');
-      const pruebasDefensa = DATOS.pruebasDefensa;
+      const pruebasDefensa = DATOS.pruebasDefensa || [];
       const pruebaActiva = computed(() => pruebasDefensa.find((p) => p.id === prueba.value) || null);
       const viajando = ref(false);
       const escala = ref(1);

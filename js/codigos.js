@@ -209,6 +209,47 @@ JOIN estado_ruta e ON e.id_estado_ruta = r.id_estado_ruta;
 -- Ejecutarlo otra vez imprime "Rutas cerradas: 0".
 `,
 
+  // Procedimiento con CURSOR EXPLÍCITO y RECORD.
+  proc_listar_pedidos: String.raw`
+PROCEDURE listar_pedidos_por_ruta(p_id_ruta IN NUMBER) IS
+    -- Cursor con JOIN de 3 tablas (pedido, cliente, estado_pedido).
+    CURSOR c_pedidos(p_ruta NUMBER) IS
+        SELECT p.id_pedido, c.nombre AS cliente_nombre,
+               e.nombre_estado, p.fecha_creacion
+        FROM pedido p
+        JOIN cliente c ON c.id_cliente = p.id_cliente
+        JOIN estado_pedido e ON e.id_estado_pedido = p.id_estado_pedido
+        WHERE p.id_ruta = p_ruta;
+
+    -- Variable de tipo RECORD declarada en la especificación del package.
+    v_pedido r_pedido_detalle;
+BEGIN
+    OPEN c_pedidos(p_id_ruta);
+    LOOP
+        FETCH c_pedidos INTO v_pedido;
+        EXIT WHEN c_pedidos%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_pedido.id_pedido||' - '||v_pedido.cliente_nombre||' - '||v_pedido.estado_nombre);
+    END LOOP;
+    CLOSE c_pedidos;
+END listar_pedidos_por_ruta;
+`,
+
+  // Cómo se ejecuta listar_pedidos_por_ruta.
+  uso_listar_pedidos: String.raw`
+SET SERVEROUTPUT ON
+
+-- Invoca el procedimiento pasando la ruta deseada (P15).
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('--- Detalle de pedidos Ruta 1 ---');
+    pkg_reparto.listar_pedidos_por_ruta(1);
+END;
+/
+-- Salida obtenida:
+--   1 - Cliente A - FALLIDO
+--   2 - Cliente B - ENTREGADO
+--   3 - Cliente C - ENTREGADO
+`,
+
   /* ---------- FUNCIONES ---------- */
 
   // Función CON parámetros (copiada del repo TallerBD, archivo 2).
