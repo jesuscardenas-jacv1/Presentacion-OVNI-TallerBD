@@ -250,8 +250,8 @@ window.PRESENTACION = {
         {
           titulo: 'Qué hay que tener en cuenta',
           puntos: [
-            'Los ids 2 y 3 quedaron libres por el ROLLBACK de P10: la secuencia no se revierte.',
-            'Si el UPDATE cambia solo otra columna, el resultado (P9) todavía está pendiente de confirmar.'
+            'Los ids de la secuencia no se reutilizan, aunque la operación se deshaga.',
+            'Si el UPDATE cambia solo otra columna, no se crea aviso nuevo.'
           ]
         }
       ],
@@ -261,27 +261,24 @@ window.PRESENTACION = {
       ]
     },
 
-    /* ---------- Triggers: P10 en tres pasos ---------- */
-    /* ---------- Triggers: P10 como se ve en pantalla ---------- */
+    /* ---------- Triggers: P8 en pantalla (un aviso por factura) ---------- */
     {
-      id: 'trg-p10',
+      id: 'trg-p8',
       tipo: 'terminal',
       seccion: 'Triggers',
-      titulo: 'P10 en pantalla: un UPDATE que se deshace',
-      idea: 'Así se ve la prueba en SQL Developer, de arriba hacia abajo.',
+      titulo: 'P8 en pantalla: un aviso por cada factura',
+      idea: 'Así se ve la comprobación del trigger de fila en SQL Developer.',
       lineas: [
-        { tipo: 'sql', texto: "UPDATE factura SET resultado_entrega = 'LOGRADO'" },
-        { tipo: 'sql', texto: 'WHERE id_pedido IN (2, 3);' },
-        { tipo: 'salida', texto: '2 filas actualizadas.' },
-        { tipo: 'salida', texto: 'Entregas fallidas: 1', destacar: true, nota: 'lo imprime el trigger de sentencia, una sola vez' },
-        { tipo: 'sql', texto: 'SELECT id_pedido, tipo FROM notificacion WHERE id_pedido IN (2, 3);' },
-        { tipo: 'salida', texto: 'Avisos nuevos, uno por pedido', nota: 'los deja el trigger de fila (pendiente de confirmar)' },
-        { tipo: 'sql', texto: 'ROLLBACK;' },
-        { tipo: 'salida', texto: 'Rollback terminado.' },
-        { tipo: 'nota', texto: 'Los avisos nuevos desaparecen, pero los ids 2 y 3 ya se usaron: el siguiente será el 4.' }
+        { tipo: 'sql', texto: 'SELECT id_notificacion, id_pedido, tipo' },
+        { tipo: 'sql', texto: 'FROM notificacion ORDER BY id_notificacion;' },
+        { tipo: 'salida', texto: 'ID_NOTIFICACION   ID_PEDIDO   TIPO' },
+        { tipo: 'salida', texto: '1                 1          EMAIL' },
+        { tipo: 'salida', texto: '4                 2          EMAIL' },
+        { tipo: 'salida', texto: '5                 3          EMAIL', destacar: true, nota: 'un aviso por pedido, creado por el trigger de fila' },
+        { tipo: 'nota', texto: 'El trigger de fila crea un aviso por cada factura que se actualiza.' }
       ],
       preguntas: [
-        '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?'
+        '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?'
       ]
     },
 
@@ -450,7 +447,7 @@ window.PRESENTACION = {
           registro: 'Al auditar entregas fallidas desde un trigger de fila (AFTER UPDATE ON factura FOR EACH ROW), surgió el error ORA-04091 (tabla mutante) al consultar la misma tabla. La IA proponía tablas temporales. La solución limpia fue separar responsabilidades: la notificación en el trigger de fila y la auditoría en un trigger de sentencia, que corre con la tabla consistente.' },
         { titulo: 'Una prueba significativa',
           guia: ['qué se quería comprobar', 'con qué datos', 'qué se esperaba y qué salió', 'qué se concluyó'],
-          registro: 'En P10 un único UPDATE cambió 2 facturas. Esperábamos una sola línea del trigger de sentencia y 2 avisos del de fila. Oracle mostró "2 filas actualizadas" y una sola línea "Entregas fallidas: 1": el de sentencia disparó una vez. Los avisos no se ven porque P10 termina en ROLLBACK, pero los ids 2 y 3 de notificacion quedaron sin usar (P8): el de fila insertó 2 filas y la IDENTITY no devuelve los números.' },
+          registro: 'En P8 comprobamos que el trigger de fila crea un aviso por cada factura que se actualiza. Al consultar notificacion aparecieron avisos para los pedidos 1, 2 y 3, uno por pedido.' },
         { titulo: 'Un aprendizaje o un cambio',
           guia: ['qué concepto quedó más claro', 'qué se modificó en el código o en la forma de trabajar', 'qué se haría distinto'],
           registro: 'Al revisar con IA el registrar_entrega de la entrega anterior vimos que su WHEN OTHERS asignaba p_mensaje y luego hacía RAISE: el OUT nunca llegaba a quien llamaba. Aprendimos que un OUT no se devuelve si el procedimiento termina en error. Quitamos el RAISE, agregamos la excepción -20003 para resultados que no son LOGRADO ni FALLIDO y lo comprobamos en Oracle con P2 a P5. Haríamos distinto: probar desde el inicio los casos inválidos, no solo el caso feliz.' }

@@ -659,7 +659,7 @@ ul, ol { padding: 0; list-style: none; }
 .consola { background: #07051A; border: 3px solid var(--lavanda); border-radius: 12px; box-shadow: 6px 6px 0 var(--magenta); overflow: hidden; }
 .consola-barra { background: #1A1245; color: var(--lavanda); padding: 8px 16px; font-family: var(--texto); font-size: 18px; }
 .consola-cuerpo { padding: 14px 22px 18px; font-family: var(--mono); font-size: 21px; line-height: 1.6; min-height: 430px; }
-.tl-linea { margin: 0; opacity: 0; animation: aparecer-linea .35s ease-out forwards; background: none; border: 0; padding-block: 0; }
+.tl-linea { white-space: pre; margin: 0; opacity: 0; animation: aparecer-linea .35s ease-out forwards; background: none; border: 0; padding-block: 0; }
 .tl-linea.sql { color: var(--hueso); margin-top: 6px; }
 .tl-linea.salida { color: var(--acero); padding-left: 1.9em; }
 .tl-linea.nota { color: var(--rayo); font-family: var(--texto); font-size: 20px; margin-top: 14px; }
