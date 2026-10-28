@@ -262,34 +262,23 @@ window.PRESENTACION = {
     },
 
     /* ---------- Triggers: P10 en tres pasos ---------- */
+    /* ---------- Triggers: P10 como se ve en pantalla ---------- */
     {
       id: 'trg-p10',
-      tipo: 'concepto',
+      tipo: 'terminal',
       seccion: 'Triggers',
-      titulo: 'P10: un UPDATE, dos triggers y un ROLLBACK',
-      idea: 'Cambiamos dos facturas con un solo UPDATE y después deshacemos todo.',
-      columnas: [
-        {
-          titulo: '1. Antes del UPDATE',
-          puntos: [
-            'Solo hay un aviso: el del pedido 1, de la prueba P1.',
-            'Los pedidos 2 y 3 todavía no tienen resultado.'
-          ]
-        },
-        {
-          titulo: '2. Después del UPDATE',
-          puntos: [
-            'El trigger de fila crea un aviso por cada factura cambiada.',
-            'El trigger de sentencia imprime una sola línea: "Entregas fallidas: 1".'
-          ]
-        },
-        {
-          titulo: '3. Consideración',
-          puntos: [
-            'El ROLLBACK borra los avisos nuevos.',
-            'Los ids 2 y 3 ya se usaron, por eso el siguiente aviso salta al 4.'
-          ]
-        }
+      titulo: 'P10 en pantalla: un UPDATE que se deshace',
+      idea: 'Así se ve la prueba en SQL Developer, de arriba hacia abajo.',
+      lineas: [
+        { tipo: 'sql', texto: "UPDATE factura SET resultado_entrega = 'LOGRADO'" },
+        { tipo: 'sql', texto: 'WHERE id_pedido IN (2, 3);' },
+        { tipo: 'salida', texto: '2 filas actualizadas.' },
+        { tipo: 'salida', texto: 'Entregas fallidas: 1', destacar: true, nota: 'lo imprime el trigger de sentencia, una sola vez' },
+        { tipo: 'sql', texto: 'SELECT id_pedido, tipo FROM notificacion WHERE id_pedido IN (2, 3);' },
+        { tipo: 'salida', texto: 'Avisos nuevos, uno por pedido', nota: 'los deja el trigger de fila (pendiente de confirmar)' },
+        { tipo: 'sql', texto: 'ROLLBACK;' },
+        { tipo: 'salida', texto: 'Rollback terminado.' },
+        { tipo: 'nota', texto: 'Los avisos nuevos desaparecen, pero los ids 2 y 3 ya se usaron: el siguiente será el 4.' }
       ],
       preguntas: [
         '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?'

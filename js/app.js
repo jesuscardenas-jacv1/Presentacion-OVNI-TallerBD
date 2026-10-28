@@ -1222,6 +1222,30 @@
   };
 
   /* ------------------------------------------------------------
+     Lámina de consola: un script corriendo línea por línea, como se
+     ve en SQL Developer. Las líneas aparecen una tras otra.
+     ------------------------------------------------------------ */
+  const LTerminal = {
+    props: { lamina: Object },
+    template: `
+      <div class="l-terminal">
+        <p class="idea">{{ lamina.idea }}</p>
+        <div class="consola">
+          <div class="consola-barra">SQL Developer · REPARTO_OVNI</div>
+          <div class="consola-cuerpo">
+            <p v-for="(l, i) in lamina.lineas" :key="i" class="tl-linea" :class="[l.tipo, { destacar: l.destacar }]"
+               :style="{ animationDelay: (i * 0.8) + 's' }">
+              <span v-if="l.tipo === 'sql'" class="prompt">SQL&gt;</span>
+              <span class="texto">{{ l.texto }}</span>
+              <span v-if="l.nota" class="nota-linea">← {{ l.nota }}</span>
+            </p>
+            <span class="cursor-consola" :style="{ animationDelay: (lamina.lineas.length * 0.8) + 's' }"></span>
+          </div>
+        </div>
+      </div>`
+  };
+
+  /* ------------------------------------------------------------
      Marco general: navegación, teclado, índice y modo ensayo
      ------------------------------------------------------------ */
   const Raiz = {
@@ -1229,7 +1253,7 @@
       Paisaje,
       'l-portada': LPortada, 'l-caida': LCaida, 'l-cierre': LCierre, 'l-ruta': LRuta, 'l-caso': LCaso, 'l-mapa': LMapa,
       'l-concepto': LConcepto, 'l-codigo': LCodigo, 'l-package': LPackage, 'l-disparos': LDisparos,
-      'l-pruebas': LPruebas, 'l-evidencias': LEvidencias, 'l-conclusiones': LConclusiones
+      'l-pruebas': LPruebas, 'l-evidencias': LEvidencias, 'l-conclusiones': LConclusiones, 'l-terminal': LTerminal
     },
     template: `
       <div class="marco">
