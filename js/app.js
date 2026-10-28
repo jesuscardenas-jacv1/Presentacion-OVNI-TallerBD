@@ -1222,6 +1222,35 @@
   };
 
   /* ------------------------------------------------------------
+     Lámina de simulación: tres "pantallas" con el antes, el durante
+     y el después de un UPDATE que termina en ROLLBACK.
+     ------------------------------------------------------------ */
+  const LSimulacion = {
+    props: { lamina: Object },
+    template: `
+      <div class="l-simulacion">
+        <p class="idea">{{ lamina.idea }}</p>
+        <div class="sim-pantallas">
+          <article v-for="p in lamina.pasos" :key="p.titulo" class="sim-pantalla">
+            <h2>{{ p.titulo }}</h2>
+            <table>
+              <thead><tr><th scope="col">pedido</th><th scope="col">id aviso</th></tr></thead>
+              <tbody>
+                <tr v-for="f in p.filas" :key="f.pedido + '-' + f.id" :class="{ nuevo: f.nuevo, borrado: f.borrado }">
+                  <td>{{ f.pedido }}</td><td>{{ f.id }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="proximo">Próximo id: {{ p.proximo }}</p>
+            <p class="nota">{{ p.nota }}</p>
+          </article>
+        </div>
+        <p class="salida"><span>DBMS_OUTPUT:</span> {{ lamina.salida }}</p>
+        <p class="pie">{{ lamina.pie }}</p>
+      </div>`
+  };
+
+  /* ------------------------------------------------------------
      Marco general: navegación, teclado, índice y modo ensayo
      ------------------------------------------------------------ */
   const Raiz = {
@@ -1229,7 +1258,7 @@
       Paisaje,
       'l-portada': LPortada, 'l-caida': LCaida, 'l-cierre': LCierre, 'l-ruta': LRuta, 'l-caso': LCaso, 'l-mapa': LMapa,
       'l-concepto': LConcepto, 'l-codigo': LCodigo, 'l-package': LPackage, 'l-disparos': LDisparos,
-      'l-pruebas': LPruebas, 'l-evidencias': LEvidencias, 'l-conclusiones': LConclusiones
+      'l-pruebas': LPruebas, 'l-evidencias': LEvidencias, 'l-conclusiones': LConclusiones, 'l-simulacion': LSimulacion
     },
     template: `
       <div class="marco">
