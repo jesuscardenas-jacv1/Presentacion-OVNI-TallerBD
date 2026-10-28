@@ -226,29 +226,35 @@ window.PRESENTACION = {
       ]
     },
     /* ---------- Triggers: estado antes y después ---------- */
-    /* ---------- Triggers: qué hace P10 (simulación de UPDATE y ROLLBACK) ---------- */
     {
       id: 'trg-estado',
-      tipo: 'simulacion',
+      tipo: 'concepto',
       seccion: 'Triggers',
-      titulo: 'Qué hace la prueba P10: un UPDATE que se deshace',
-      idea: 'P10 cambia dos facturas con un solo UPDATE. Los triggers reaccionan y el ROLLBACK borra lo que dejaron.',
-      pasos: [
-        { titulo: 'Antes del UPDATE',
-          filas: [{ pedido: 1, id: 1 }],
-          proximo: 2,
-          nota: 'Solo queda el aviso que dejó la prueba P1.' },
-        { titulo: 'Después del UPDATE',
-          filas: [{ pedido: 1, id: 1 }, { pedido: 2, id: 2, nuevo: true }, { pedido: 3, id: 3, nuevo: true }],
-          proximo: 4,
-          nota: 'El trigger de fila creó un aviso por cada factura cambiada.' },
-        { titulo: 'Después del ROLLBACK',
-          filas: [{ pedido: 1, id: 1 }, { pedido: 2, id: 2, borrado: true }, { pedido: 3, id: 3, borrado: true }],
-          proximo: 4,
-          nota: 'Los avisos nuevos desaparecen, pero los ids 2 y 3 ya se usaron.' }
+      titulo: 'Cómo revisamos el efecto del trigger',
+      idea: 'Miramos la tabla notificacion antes del UPDATE y otra vez después. Lo que cambió entre las dos consultas es lo que dejó el trigger.',
+      columnas: [
+        {
+          titulo: 'Antes del UPDATE',
+          puntos: [
+            'Se consulta notificacion y se anota qué avisos existen para cada pedido.',
+            'Luego se hace el UPDATE sobre factura: resultado_entrega pasa a FALLIDO o LOGRADO.'
+          ]
+        },
+        {
+          titulo: 'Después del UPDATE',
+          puntos: [
+            'El trigger de fila agregó un aviso por cada factura que cambió.',
+            'En la prueba P8 quedaron avisos para los pedidos 1, 2 y 3.'
+          ]
+        },
+        {
+          titulo: 'Qué hay que tener en cuenta',
+          puntos: [
+            'Los ids 2 y 3 quedaron libres por el ROLLBACK de P10: la secuencia no se revierte.',
+            'Si el UPDATE cambia solo otra columna, el resultado (P9) todavía está pendiente de confirmar.'
+          ]
+        }
       ],
-      salida: 'Entregas fallidas: 1   (una sola línea: la imprime el trigger de sentencia)',
-      pie: 'Los ids son un ejemplo del orden de la prueba. La secuencia no se revierte con ROLLBACK, por eso el siguiente id salta. P9 sigue pendiente de confirmar.',
       preguntas: [
         '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?',
         '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?'
