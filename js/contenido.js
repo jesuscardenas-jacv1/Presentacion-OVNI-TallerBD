@@ -236,22 +236,19 @@ window.PRESENTACION = {
         {
           titulo: 'Antes del UPDATE',
           puntos: [
-            'Se consulta notificacion y se anota qué avisos existen para cada pedido.',
-            'Luego se hace el UPDATE sobre factura: resultado_entrega pasa a FALLIDO o LOGRADO.'
+            'Se consulta notificacion y se anota qué avisos existen para cada pedido.'
           ]
         },
         {
           titulo: 'Después del UPDATE',
           puntos: [
-            'El trigger de fila agregó un aviso por cada factura que cambió.',
-            'En la prueba P8 quedaron avisos para los pedidos 1, 2 y 3.'
+            'El trigger de fila agregó un aviso por cada factura que cambió.'
           ]
         },
         {
           titulo: 'Qué hay que tener en cuenta',
           puntos: [
-            'Los ids de la secuencia no se reutilizan, aunque la operación se deshaga.',
-            'Si el UPDATE cambia solo otra columna, no se crea aviso nuevo.'
+            'Los ids de la secuencia no se reutilizan, aunque la operación se deshaga.'
           ]
         }
       ],
