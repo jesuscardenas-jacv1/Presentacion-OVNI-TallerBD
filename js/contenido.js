@@ -611,18 +611,22 @@ window.PRESENTACION = {
       seccion: 'Bitácora de IA',
       titulo: 'Cuatro momentos reales del trabajo con IA',
       items: [
+        /* POR CONFIRMAR (Lucas): la pauta exige casos reales. El VARRAY ya venía del repo TallerBD;
+           esta evidencia solo vale si la conversación con la IA sobre tabla o Nested Table ocurrió de verdad. */
         { titulo: 'Una decisión técnica',
           guia: ['qué había que resolver', 'qué alternativas hubo, incluidas las de la IA', 'cuál se eligió y por qué'],
           registro: 'Para validar razones de fallo, la IA propuso una tabla relacional extra o una Nested Table. Elegimos definir t_razones_fallo como VARRAY(10) en el package: al ser un catálogo fijo (8 razones) de solo lectura durante la entrega, el VARRAY ahorra lecturas a disco en cada despacho y mantiene la regla centralizada en la base de datos.' },
+        /* POR CONFIRMAR (Lucas): solo vale si el ORA-04091 apareció de verdad al desarrollar
+           y la IA propuso tablas temporales. Si fue el ejemplo armado para la animación, no sirve. */
         { titulo: 'Un error o una respuesta que no servía',
           guia: ['qué problema apareció', 'qué sugirió la IA', 'cómo se encontró la causa', 'cómo se comprobó que quedó resuelto'],
           registro: 'Al auditar entregas fallidas desde un trigger de fila (AFTER UPDATE ON factura FOR EACH ROW), surgió el error ORA-04091 (tabla mutante) al consultar la misma tabla. La IA proponía tablas temporales. La solución limpia fue separar responsabilidades: la notificación en el trigger de fila y la auditoría en un trigger de sentencia, que corre con la tabla consistente.' },
         { titulo: 'Una prueba significativa',
           guia: ['qué se quería comprobar', 'con qué datos', 'qué se esperaba y qué salió', 'qué se concluyó'],
-          registro: 'En la prueba P10 comprobamos la granularidad de los triggers con un único UPDATE sobre 2 pedidos. Se confirmó que el trigger de sentencia trg_contar_fallidas disparó 1 sola vez (imprimiendo una línea de resumen), mientras que el de fila trg_notificar_entrega disparó 2 veces, creando una notificación individual para cada cliente.' },
+          registro: 'En P10 un único UPDATE cambió 2 facturas. Esperábamos una sola línea del trigger de sentencia y 2 avisos del de fila. Oracle mostró "2 filas actualizadas" y una sola línea "Entregas fallidas: 1": el de sentencia disparó una vez. Los avisos no se ven porque P10 termina en ROLLBACK, pero los ids 2 y 3 de notificacion quedaron sin usar (P8): el de fila insertó 2 filas y la IDENTITY no devuelve los números.' },
         { titulo: 'Un aprendizaje o un cambio',
           guia: ['qué concepto quedó más claro', 'qué se modificó en el código o en la forma de trabajar', 'qué se haría distinto'],
-          registro: 'Aprendimos a no aceptar código de IA sin probarlo en Oracle. La IA propuso WHEN OTHERS THEN RAISE en registrar_entrega, cortando la transacción e impidiendo que el parámetro OUT entregara el mensaje a la aplicación. Rediseñamos el bloque capturando excepciones propias (-20001 a -20003) y devolviendo el error por el parámetro OUT tras el ROLLBACK.' }
+          registro: 'Al revisar con IA el registrar_entrega de la entrega anterior vimos que su WHEN OTHERS asignaba p_mensaje y luego hacía RAISE: el OUT nunca llegaba a quien llamaba. Aprendimos que un OUT no se devuelve si el procedimiento termina en error. Quitamos el RAISE, agregamos la excepción -20003 para resultados que no son LOGRADO ni FALLIDO y lo comprobamos en Oracle con P2 a P5. Haríamos distinto: probar desde el inicio los casos inválidos, no solo el caso feliz.' }
       ],
       preguntas: [
         '172. Seleccione un error que haya encontrado y explique cómo lo resolvió.',
