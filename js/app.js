@@ -806,6 +806,66 @@
             </g>
             <rect x="1100" y="90" width="460" height="560" rx="44" fill="none" stroke="#A9BCD0" stroke-width="16"/>
 
+            <!-- bodega en el piso: los repartos listos para salir; cada caja es un aviso que dejó el trigger -->
+            <g class="bodega" :class="{ cargada: fase === 'viaje' || fase === 'final' }">
+              <text x="70" y="744" class="titulo-bodega">BODEGA: REPARTOS LISTOS. 1 caja = 1 aviso al cliente</text>
+              <rect x="60" y="866" width="990" height="14" rx="4" fill="#5A4A8B"/>
+              <g class="caja-r" style="--d: 0.60s">
+                <rect x="90" y="772" width="104" height="90" rx="6" fill="#C99A5B" stroke="#8A5E2F" stroke-width="4"/>
+                <rect x="136" y="772" width="12" height="90" fill="#E9C58A"/>
+                <text class="etiqueta-caja" x="120" y="812" text-anchor="middle">P1</text>
+                <g class="sello">
+                  <rect x="100" y="828" width="84" height="24" rx="5" fill="#D4F56A" stroke="#150F36" stroke-width="2"/>
+                  <text x="142" y="845" text-anchor="middle" class="texto-sello">AVISO</text>
+                </g>
+              </g>
+              <g class="caja-r" style="--d: 1.05s">
+                <rect x="250" y="772" width="104" height="90" rx="6" fill="#C99A5B" stroke="#8A5E2F" stroke-width="4"/>
+                <rect x="296" y="772" width="12" height="90" fill="#E9C58A"/>
+                <text class="etiqueta-caja" x="280" y="812" text-anchor="middle">P2</text>
+                <g class="sello">
+                  <rect x="260" y="828" width="84" height="24" rx="5" fill="#D4F56A" stroke="#150F36" stroke-width="2"/>
+                  <text x="302" y="845" text-anchor="middle" class="texto-sello">AVISO</text>
+                </g>
+              </g>
+              <g class="caja-r" style="--d: 1.50s">
+                <rect x="410" y="772" width="104" height="90" rx="6" fill="#C99A5B" stroke="#8A5E2F" stroke-width="4"/>
+                <rect x="456" y="772" width="12" height="90" fill="#E9C58A"/>
+                <text class="etiqueta-caja" x="440" y="812" text-anchor="middle">P3</text>
+                <g class="sello">
+                  <rect x="420" y="828" width="84" height="24" rx="5" fill="#D4F56A" stroke="#150F36" stroke-width="2"/>
+                  <text x="462" y="845" text-anchor="middle" class="texto-sello">AVISO</text>
+                </g>
+              </g>
+              <g class="caja-r" style="--d: 1.95s">
+                <rect x="570" y="772" width="104" height="90" rx="6" fill="#C99A5B" stroke="#8A5E2F" stroke-width="4"/>
+                <rect x="616" y="772" width="12" height="90" fill="#E9C58A"/>
+                <text class="etiqueta-caja" x="600" y="812" text-anchor="middle">P4</text>
+                <g class="sello">
+                  <rect x="580" y="828" width="84" height="24" rx="5" fill="#D4F56A" stroke="#150F36" stroke-width="2"/>
+                  <text x="622" y="845" text-anchor="middle" class="texto-sello">AVISO</text>
+                </g>
+              </g>
+              <g class="caja-r" style="--d: 2.40s">
+                <rect x="730" y="772" width="104" height="90" rx="6" fill="#C99A5B" stroke="#8A5E2F" stroke-width="4"/>
+                <rect x="776" y="772" width="12" height="90" fill="#E9C58A"/>
+                <text class="etiqueta-caja" x="760" y="812" text-anchor="middle">P5</text>
+                <g class="sello">
+                  <rect x="740" y="828" width="84" height="24" rx="5" fill="#D4F56A" stroke="#150F36" stroke-width="2"/>
+                  <text x="782" y="845" text-anchor="middle" class="texto-sello">AVISO</text>
+                </g>
+              </g>
+              <g class="caja-r" style="--d: 2.85s">
+                <rect x="890" y="772" width="104" height="90" rx="6" fill="#C99A5B" stroke="#8A5E2F" stroke-width="4"/>
+                <rect x="936" y="772" width="12" height="90" fill="#E9C58A"/>
+                <text class="etiqueta-caja" x="920" y="812" text-anchor="middle">P6</text>
+                <g class="sello">
+                  <rect x="900" y="828" width="84" height="24" rx="5" fill="#D4F56A" stroke="#150F36" stroke-width="2"/>
+                  <text x="942" y="845" text-anchor="middle" class="texto-sello">AVISO</text>
+                </g>
+              </g>
+            </g>
+
             <!-- sillón -->
             <rect x="620" y="470" width="470" height="170" rx="40" fill="#8E2350"/>
             <rect x="600" y="610" width="510" height="80" rx="24" fill="#C2356E"/>
@@ -1055,7 +1115,7 @@
       });
 
       const lanzarEscombros = () => {
-        escombros.value = Array.from({ length: 16 }, (_, i) => ({
+        const restos = Array.from({ length: 16 }, (_, i) => ({
           id: i,
           tipo: i % 3 === 0 ? 'hoja' : 'choclo',
           dx: Math.round((azar() - 0.5) * 900),
@@ -1063,6 +1123,16 @@
           r: Math.round((azar() - 0.5) * 900),
           d: +(azar() * 0.12).toFixed(2)
         }));
+        /* Cajas de envío: salen disparadas de la nave, como si el reparto se derramara */
+        const cajas = Array.from({ length: 7 }, (_, i) => ({
+          id: 'caja' + i,
+          tipo: 'caja',
+          dx: Math.round((azar() - 0.5) * 760),
+          dy: -Math.round(200 + azar() * 240),
+          r: Math.round((azar() - 0.5) * 600),
+          d: +(0.04 + azar() * 0.16).toFixed(2)
+        }));
+        escombros.value = [...restos, ...cajas];
       };
 
       const correr = async () => {

@@ -30,6 +30,9 @@ LÁMINA 7: LA NAVE QUE CAE
   el problema, luego la nave muestra el error y su corrección.
   El código y el error de la pantalla se cambian en js/codigos.js, claves
   caida_sql y caida_error. Los textos del final, en js/contenido.js (id 'mision').
+  Al estrellarse salen cajas de envío por el aire. En la corrección, la bodega
+  del piso muestra las 6 cajas cargadas: cada una es un aviso al cliente (sello AVISO).
+  La bodega está en js/app.js (LCaida, dentro del bloque VIAJE) y sus estilos en css/estilos.css.
 
 LÁMINA 16: LA CORRECCIÓN
   El mismo trigger sin FOR EACH ROW (trigger de sentencia). También se

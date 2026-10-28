@@ -458,6 +458,7 @@ ul, ol { padding: 0; list-style: none; }
 .escombro { position: absolute; left: 820px; top: 700px; animation: escombro 1.5s cubic-bezier(.2, .7, .4, 1) forwards; }
 .escombro.choclo { width: 14px; height: 34px; margin: -17px 0 0 -7px; border-radius: 7px; background: #F2C94C; box-shadow: inset 0 0 0 3px #D9A93A; }
 .escombro.hoja { width: 46px; height: 12px; margin: -6px 0 0 -23px; border-radius: 0 100% 0 100%; background: #5FA34A; }
+.escombro.caja { width: 40px; height: 34px; margin: -17px 0 0 -20px; border: 3px solid #8A5E2F; border-radius: 4px; background: linear-gradient(90deg, transparent 42%, #E9C58A 42% 58%, transparent 58%), #C99A5B; }
 @keyframes escombro {
   0% { transform: translate(0, 0) rotate(0); opacity: 1; }
   55% { transform: translate(calc(var(--dx) * .6), var(--dy)) rotate(calc(var(--r) * .6)); opacity: 1; }
@@ -597,6 +598,16 @@ ul, ol { padding: 0; list-style: none; }
 .fase-viaje .tierra-lejos, .fase-final .tierra-lejos { animation: alejarse 9s ease-out forwards; }
 @keyframes alejarse { to { transform: translate(-150px, -80px) scale(.25); } }
 .viaje .ojos-vaca, .viaje .ojos-susto-vaca { opacity: 0; }
+/* bodega: las cajas se cargan una por una y cada una recibe su sello AVISO */
+.caja-r, .sello { transform-box: fill-box; transform-origin: center; }
+.bodega .caja-r, .bodega .sello { opacity: 0; }
+.bodega.cargada .caja-r { animation: cargar-caja .55s cubic-bezier(.2, .8, .3, 1.15) forwards; animation-delay: var(--d); }
+@keyframes cargar-caja { from { opacity: 0; transform: translateY(-80px); } to { opacity: 1; transform: none; } }
+.bodega.cargada .sello { animation: sellar .35s ease-out forwards; animation-delay: calc(var(--d) + .55s); }
+@keyframes sellar { from { opacity: 0; transform: scale(2.2) rotate(-14deg); } to { opacity: 1; transform: rotate(-6deg); } }
+.etiqueta-caja { font-family: var(--rotulo); font-size: 30px; fill: #150F36; }
+.texto-sello { font-family: var(--rotulo); font-size: 15px; fill: #150F36; }
+.titulo-bodega { font-family: var(--rotulo); font-size: 22px; fill: #D4F56A; }
 .viaje .ojos-saltones { opacity: 0; }
 .viaje .ojos-relax { opacity: 1; }
 .viaje .cabeza-vaca { animation: none; }
