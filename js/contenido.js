@@ -118,7 +118,7 @@ window.PRESENTACION = {
     {
       id: 'caso',
       tipo: 'caso',
-      seccion: 'El caso',
+      seccion: 'Introducción',
       titulo: 'Entregas que nadie puede seguir',
       problemas: [
         { titulo: 'Cada repartidor informa a su manera', texto: 'No hay un formato común para confirmar una entrega.' },
@@ -134,73 +134,11 @@ window.PRESENTACION = {
       ]
     },
 
-    /* ---------- 4. Plan de vuelo ---------- */
-    {
-      id: 'plan',
-      tipo: 'ruta',
-      seccion: 'Plan de vuelo',
-      titulo: 'Seis paradas antes de aterrizar',
-      paradas: [
-        { nombre: 'El caso', detalle: 'Qué problema tiene el reparto y qué resolvemos.', ir: 'caso' },
-        { nombre: 'Procedimientos', detalle: 'Con y sin parámetros.', ir: 'proc-concepto' },
-        { nombre: 'Funciones', detalle: 'Con y sin parámetros, y su uso en un SELECT.', ir: 'func-concepto' },
-        { nombre: 'Package', detalle: 'Qué es público y qué queda privado.', ir: 'pkg-demo' },
-        { nombre: 'Triggers', detalle: 'A nivel de fila y a nivel de sentencia.', ir: 'trg-demo' },
-        { nombre: 'Pruebas y bitácora de IA', detalle: 'Qué comprobamos y cómo trabajamos con la IA.', ir: 'pruebas' }
-      ]
-    },
-
-    /* ---------- 4. Mapa de objetos ---------- */
-    {
-      id: 'mapa',
-      tipo: 'mapa',
-      seccion: 'La solución',
-      titulo: 'Cómo se conectan los objetos',
-      flujos: [
-        {
-          nombre: 'Cuando se registra una entrega',
-          pasos: [
-            { tipo: 'Quién', nombre: 'Repartidor', que: 'marca la entrega en la app' },
-            { tipo: 'Procedimiento', nombre: 'registrar_entrega', que: 'valida y actualiza pedido y factura' },
-            { tipo: 'Trigger de fila', nombre: 'trg_notificar_entrega', que: 'se dispara al actualizar resultado_entrega' },
-            { tipo: 'Tabla', nombre: 'notificacion', que: 'queda el aviso al cliente' }
-          ]
-        },
-        {
-          nombre: 'Cuando logística pide un reporte',
-          pasos: [
-            { tipo: 'Quién', nombre: 'Logística', que: 'consulta las rutas' },
-            { tipo: 'Función', nombre: 'contar_pedidos_fallidos', que: 'cuenta los fallidos de una ruta' },
-            { tipo: 'Tablas', nombre: 'pedido y factura', que: 'solo lectura' }
-          ]
-        },
-        {
-          nombre: 'Al cerrar la jornada',
-          pasos: [
-            { tipo: 'Quién', nombre: 'Logística', que: 'revisa cuánto queda por entregar' },
-            { tipo: 'Función', nombre: 'total_pedidos_en_ruta', que: 'cuenta los pedidos que siguen en ruta' },
-            { tipo: 'Procedimiento', nombre: 'cerrar_rutas_completas', que: 'finaliza las rutas sin pendientes' },
-            { tipo: 'Tabla', nombre: 'ruta', que: 'queda en FINALIZADA' }
-          ]
-        }
-      ],
-      /* Ya no queda nada por integrar. Si se agrega un objeto nuevo, se puede volver a listar aquí
-         como { nombre, clave } y se marca solo como "por integrar" mientras su clave esté vacía. */
-      porIntegrar: [],
-      nota: 'Todo vive en pkg_reparto, salvo los dos triggers de factura: trg_notificar_entrega (fila) y trg_contar_fallidas (sentencia).',
-      preguntas: [
-        '101. ¿Cómo se relacionan los procedimientos, funciones, packages y triggers de nuestro proyecto?',
-        '103. ¿Qué objetos dependen de otros objetos?',
-        '104. ¿En qué orden deben crearse o compilarse los objetos?',
-        '109. ¿Qué errores pueden aparecer cuando los componentes funcionan por separado, pero no en conjunto?'
-      ]
-    },
-
     /* ---------- 5. Procedimientos: concepto ---------- */
     {
       id: 'proc-concepto',
       tipo: 'concepto',
-      seccion: 'Procedimientos',
+      seccion: 'Funciones y procedimientos',
       titulo: 'Procedimiento: una orden que la base ejecuta',
       idea: 'En la nave sería un protocolo de misión: se da la orden y la tripulación actúa. No trae nada de vuelta, salvo lo que deje en un parámetro OUT.',
       columnas: [
@@ -240,7 +178,7 @@ window.PRESENTACION = {
     {
       id: 'proc-con',
       tipo: 'codigo',
-      seccion: 'Procedimientos',
+      seccion: 'Funciones y procedimientos',
       titulo: 'registrar_entrega, con parámetros',
       resumen: [
         'Recibe el pedido, el resultado y la razón; devuelve un mensaje por el parámetro OUT.',
@@ -265,7 +203,7 @@ window.PRESENTACION = {
     {
       id: 'proc-sin',
       tipo: 'codigo',
-      seccion: 'Procedimientos',
+      seccion: 'Funciones y procedimientos',
       titulo: 'cerrar_rutas_completas, sin parámetros',
       resumen: [
         'No recibe nada: siempre revisa todas las rutas EN_CURSO.',
@@ -288,7 +226,7 @@ window.PRESENTACION = {
     {
       id: 'func-concepto',
       tipo: 'concepto',
-      seccion: 'Funciones',
+      seccion: 'Funciones y procedimientos',
       titulo: 'Función: una sonda que siempre vuelve con un dato',
       idea: 'Sale, mide y regresa con un valor. Por eso se puede usar dentro de un SELECT, cosa que un procedimiento no permite.',
       tabla: {
@@ -315,7 +253,7 @@ window.PRESENTACION = {
     {
       id: 'func-con',
       tipo: 'codigo',
-      seccion: 'Funciones',
+      seccion: 'Funciones y procedimientos',
       titulo: 'contar_pedidos_fallidos, con parámetros',
       resumen: [
         'Recibe una ruta y devuelve cuántas de sus entregas fallaron.',
@@ -339,7 +277,7 @@ window.PRESENTACION = {
     {
       id: 'func-sin',
       tipo: 'codigo',
-      seccion: 'Funciones',
+      seccion: 'Funciones y procedimientos',
       titulo: 'total_pedidos_en_ruta, sin parámetros',
       resumen: [
         'No recibe nada y devuelve cuántos pedidos siguen EN_RUTA, sumando todas las rutas.',
@@ -355,80 +293,6 @@ window.PRESENTACION = {
         '59. ¿Qué necesidad del proyecto resuelve cada función?',
         '63. ¿Qué diferencia existe entre una función con parámetros y una sin parámetros?',
         '67. ¿Cómo comprobaríamos que el valor devuelto es correcto?'
-      ]
-    },
-
-    /* ---------- 11. Package: demo público / privado ---------- */
-    {
-      id: 'pkg-demo',
-      tipo: 'package',
-      seccion: 'Package',
-      titulo: 'pkg_reparto: lo que se ve desde fuera y lo que no',
-      idea: 'La especificación son las ventanas de la nave. El cuerpo es la sala de máquinas. Elige un elemento y mira qué pasa si alguien lo usa desde fuera.',
-      elementos: [
-        { nombre: 'r_pedido_detalle', clase: 'tipo RECORD', publico: true,
-          llamada: 'v_pedido pkg_reparto.r_pedido_detalle;',
-          resultado: 'Compila: el tipo está declarado en la especificación.' },
-        { nombre: 'listar_pedidos_por_ruta', clase: 'procedimiento con cursor y RECORD', publico: true,
-          llamada: 'pkg_reparto.listar_pedidos_por_ruta(1);',
-          resultado: 'Se ejecuta: recorre c_pedidos y muestra id, cliente y estado.' },
-        { nombre: 'registrar_entrega', clase: 'procedimiento', publico: true,
-          llamada: "pkg_reparto.registrar_entrega(1, 'LOGRADO', NULL, v_msg);",
-          resultado: 'Se ejecuta: está declarado en la especificación.' },
-        { nombre: 'contar_pedidos_fallidos', clase: 'función', publico: true,
-          llamada: 'SELECT pkg_reparto.contar_pedidos_fallidos(1) FROM dual;',
-          resultado: 'Devuelve un número: está declarada en la especificación.' },
-        { nombre: 'cerrar_rutas_completas', clase: 'procedimiento sin parámetros', publico: true,
-          llamada: 'pkg_reparto.cerrar_rutas_completas;',
-          resultado: 'Se ejecuta e imprime cuántas rutas cerró.' },
-        { nombre: 'total_pedidos_en_ruta', clase: 'función sin parámetros', publico: true,
-          llamada: 'SELECT pkg_reparto.total_pedidos_en_ruta FROM dual;',
-          resultado: 'Devuelve un número: está declarada en la especificación.' },
-        { nombre: 'es_razon_valida', clase: 'función privada', publico: false,
-          llamada: "pkg_reparto.es_razon_valida('CLIENTE_AUSENTE')",
-          resultado: "PLS-00302: component 'ES_RAZON_VALIDA' must be declared" },
-        { nombre: 'v_razones_fallo', clase: 'VARRAY con el catálogo', publico: false,
-          llamada: 'pkg_reparto.v_razones_fallo(1)',
-          resultado: "PLS-00302: component 'V_RAZONES_FALLO' must be declared" },
-        { nombre: 'e_razon_obligatoria', clase: 'excepción -20001', publico: false,
-          llamada: 'WHEN pkg_reparto.e_razon_obligatoria THEN ...',
-          resultado: "PLS-00302: component 'E_RAZON_OBLIGATORIA' must be declared" },
-        { nombre: 'e_razon_no_valida', clase: 'excepción -20002', publico: false,
-          llamada: 'WHEN pkg_reparto.e_razon_no_valida THEN ...',
-          resultado: "PLS-00302: component 'E_RAZON_NO_VALIDA' must be declared" }
-      ],
-      porque: 'Nadie de fuera puede cambiar el catálogo de razones ni depender de cómo validamos: es_razon_valida es un detalle interno de registrar_entrega. Así se puede reescribir el cuerpo sin romper a quien usa el package.',
-      preguntas: [
-        '72. ¿Qué diferencia existe entre la especificación y el cuerpo de un package?',
-        '74. ¿Por qué decidimos exponer algunos procedimientos o funciones y mantener otros privados?',
-        '79. ¿Qué cambios podrían afectar a los programas que utilizan los elementos públicos del package?',
-        '167. ¿Por qué se tomó esa decisión de encapsulamiento?'
-      ]
-    },
-
-    /* ---------- 12. Package: código ---------- */
-    {
-      id: 'pkg-codigo',
-      tipo: 'codigo',
-      seccion: 'Package',
-      titulo: 'Especificación y cuerpo de pkg_reparto',
-      resumen: [
-        'La especificación declara qué existe: un tipo, tres procedimientos y dos funciones.',
-        'El cuerpo guarda cómo funciona y lo que nadie más necesita ver.',
-        'Privados: el catálogo de razones, tres excepciones de negocio y la función es_razon_valida.',
-        'Si cambia el cuerpo y no la especificación, quien usa el package no se entera.'
-      ],
-      paneles: [
-        { etiqueta: 'Especificación (público)', clave: 'pkg_especificacion' },
-        { etiqueta: 'Cuerpo: lo privado', clave: 'pkg_privados' },
-        { etiqueta: 'Función privada', clave: 'pkg_func_privada' },
-        { etiqueta: 'Cursor con RECORD', clave: 'proc_listar_pedidos' },
-        { etiqueta: 'Uso del Cursor', clave: 'uso_listar_pedidos' }
-      ],
-      preguntas: [
-        '166. Explique la organización de su package y distinga sus elementos públicos y privados.',
-        '78. ¿Qué ocurriría si necesitáramos modificar la implementación interna de una función privada?',
-        '81. ¿Qué errores podrían aparecer si la especificación y el cuerpo del package no fueran coherentes?'
       ]
     },
 
@@ -554,6 +418,135 @@ window.PRESENTACION = {
         '93. ¿Qué riesgos existen al utilizar triggers para implementar reglas de negocio?'
       ]
     },
+    /* ---------- Triggers: estado antes y después ---------- */
+    {
+      id: 'trg-estado',
+      tipo: 'concepto',
+      seccion: 'Triggers',
+      titulo: 'Cómo revisamos el efecto del trigger',
+      idea: 'Miramos la tabla notificacion antes del UPDATE y otra vez después. Lo que cambió entre las dos consultas es lo que dejó el trigger.',
+      columnas: [
+        {
+          titulo: 'Antes del UPDATE',
+          puntos: [
+            'Se consulta notificacion y se anota qué avisos existen para cada pedido.',
+            'Luego se hace el UPDATE sobre factura: resultado_entrega pasa a FALLIDO o LOGRADO.'
+          ]
+        },
+        {
+          titulo: 'Después del UPDATE',
+          puntos: [
+            'El trigger de fila agregó un aviso por cada factura que cambió.',
+            'En la prueba P8 quedaron avisos para los pedidos 1, 2 y 3.'
+          ]
+        },
+        {
+          titulo: 'Qué hay que tener en cuenta',
+          puntos: [
+            'Los ids 2 y 3 quedaron libres por el ROLLBACK de P10: la secuencia no se revierte.',
+            'Si el UPDATE cambia solo otra columna, el resultado (P9) todavía está pendiente de confirmar.'
+          ]
+        }
+      ],
+      preguntas: [
+        '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?',
+        '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?'
+      ]
+    },
+
+
+    /* ---------- 11. Package: demo público / privado ---------- */
+    {
+      id: 'pkg-demo',
+      tipo: 'package',
+      seccion: 'Paquetes',
+      titulo: 'pkg_reparto: lo que se ve desde fuera y lo que no',
+      idea: 'La especificación son las ventanas de la nave. El cuerpo es la sala de máquinas. Elige un elemento y mira qué pasa si alguien lo usa desde fuera.',
+      elementos: [
+        { nombre: 'r_pedido_detalle', clase: 'tipo RECORD', publico: true,
+          llamada: 'v_pedido pkg_reparto.r_pedido_detalle;',
+          resultado: 'Compila: el tipo está declarado en la especificación.' },
+        { nombre: 'listar_pedidos_por_ruta', clase: 'procedimiento con cursor y RECORD', publico: true,
+          llamada: 'pkg_reparto.listar_pedidos_por_ruta(1);',
+          resultado: 'Se ejecuta: recorre c_pedidos y muestra id, cliente y estado.' },
+        { nombre: 'registrar_entrega', clase: 'procedimiento', publico: true,
+          llamada: "pkg_reparto.registrar_entrega(1, 'LOGRADO', NULL, v_msg);",
+          resultado: 'Se ejecuta: está declarado en la especificación.' },
+        { nombre: 'contar_pedidos_fallidos', clase: 'función', publico: true,
+          llamada: 'SELECT pkg_reparto.contar_pedidos_fallidos(1) FROM dual;',
+          resultado: 'Devuelve un número: está declarada en la especificación.' },
+        { nombre: 'cerrar_rutas_completas', clase: 'procedimiento sin parámetros', publico: true,
+          llamada: 'pkg_reparto.cerrar_rutas_completas;',
+          resultado: 'Se ejecuta e imprime cuántas rutas cerró.' },
+        { nombre: 'total_pedidos_en_ruta', clase: 'función sin parámetros', publico: true,
+          llamada: 'SELECT pkg_reparto.total_pedidos_en_ruta FROM dual;',
+          resultado: 'Devuelve un número: está declarada en la especificación.' },
+        { nombre: 'es_razon_valida', clase: 'función privada', publico: false,
+          llamada: "pkg_reparto.es_razon_valida('CLIENTE_AUSENTE')",
+          resultado: "PLS-00302: component 'ES_RAZON_VALIDA' must be declared" },
+        { nombre: 'v_razones_fallo', clase: 'VARRAY con el catálogo', publico: false,
+          llamada: 'pkg_reparto.v_razones_fallo(1)',
+          resultado: "PLS-00302: component 'V_RAZONES_FALLO' must be declared" },
+        { nombre: 'e_razon_obligatoria', clase: 'excepción -20001', publico: false,
+          llamada: 'WHEN pkg_reparto.e_razon_obligatoria THEN ...',
+          resultado: "PLS-00302: component 'E_RAZON_OBLIGATORIA' must be declared" },
+        { nombre: 'e_razon_no_valida', clase: 'excepción -20002', publico: false,
+          llamada: 'WHEN pkg_reparto.e_razon_no_valida THEN ...',
+          resultado: "PLS-00302: component 'E_RAZON_NO_VALIDA' must be declared" }
+      ],
+      porque: 'Nadie de fuera puede cambiar el catálogo de razones ni depender de cómo validamos: es_razon_valida es un detalle interno de registrar_entrega. Así se puede reescribir el cuerpo sin romper a quien usa el package.',
+      preguntas: [
+        '72. ¿Qué diferencia existe entre la especificación y el cuerpo de un package?',
+        '74. ¿Por qué decidimos exponer algunos procedimientos o funciones y mantener otros privados?',
+        '79. ¿Qué cambios podrían afectar a los programas que utilizan los elementos públicos del package?',
+        '167. ¿Por qué se tomó esa decisión de encapsulamiento?'
+      ]
+    },
+
+    /* ---------- 12. Package: código ---------- */
+    {
+      id: 'pkg-codigo',
+      tipo: 'codigo',
+      seccion: 'Paquetes',
+      titulo: 'Especificación y cuerpo de pkg_reparto',
+      resumen: [
+        'La especificación declara qué existe: un tipo, tres procedimientos y dos funciones.',
+        'El cuerpo guarda cómo funciona y lo que nadie más necesita ver.',
+        'Privados: el catálogo de razones, tres excepciones de negocio y la función es_razon_valida.',
+        'Si cambia el cuerpo y no la especificación, quien usa el package no se entera.'
+      ],
+      paneles: [
+        { etiqueta: 'Especificación (público)', clave: 'pkg_especificacion' },
+        { etiqueta: 'Cuerpo: lo privado', clave: 'pkg_privados' },
+        { etiqueta: 'Función privada', clave: 'pkg_func_privada' },
+        { etiqueta: 'Cursor con RECORD', clave: 'proc_listar_pedidos' },
+        { etiqueta: 'Uso del Cursor', clave: 'uso_listar_pedidos' }
+      ],
+      preguntas: [
+        '166. Explique la organización de su package y distinga sus elementos públicos y privados.',
+        '78. ¿Qué ocurriría si necesitáramos modificar la implementación interna de una función privada?',
+        '81. ¿Qué errores podrían aparecer si la especificación y el cuerpo del package no fueran coherentes?'
+      ]
+    },
+    /* ---------- Paquetes: ejecución en bloque anónimo ---------- */
+    {
+      id: 'pkg-ejecutar',
+      tipo: 'codigo',
+      seccion: 'Paquetes',
+      titulo: 'Ejecutamos el paquete en un bloque anónimo',
+      resumen: [
+        'Se llama al procedimiento con el prefijo del paquete: pkg_reparto.registrar_entrega(...).',
+        'El resultado vuelve por el parámetro OUT, y DBMS_OUTPUT lo muestra con SET SERVEROUTPUT ON.',
+        'Después de la prueba se hace ROLLBACK, así la base queda como estaba.'
+      ],
+      paneles: [
+        { etiqueta: 'Bloque anónimo', clave: 'uso_paquete_bloque' }
+      ],
+      preguntas: [
+        '53. ¿Qué ventajas ofrece encapsular una operación de negocio en un procedimiento?'
+      ]
+    },
+
 
     /* ---------- 16. Pruebas ---------- */
     {
@@ -643,6 +636,8 @@ window.PRESENTACION = {
           texto: 'La lógica del reparto vive en la base de datos: pkg_reparto registra las entregas y valida las razones de fallo, y el trigger avisa al cliente sin que nadie tenga que acordarse.' },
         { titulo: 'Qué cambia para el negocio',
           texto: 'Los motivos de fallo quedan estandarizados, pedido y factura nunca quedan a medias y el aviso al cliente sale en el momento.' },
+        { titulo: 'Competencias que nos llevamos',
+          texto: 'Diseñar reglas de negocio dentro de la base (package, procedimientos, funciones, triggers, cursores y excepciones) y probarlas con datos antes de darlas por buenas. Para nuestra formación como ingenieros de software, esto sirve para razonar sobre la integridad de los datos y revisar cualquier propuesta, también la de una IA, antes de aceptarla.' },
         { titulo: 'Límites y mejoras',
           texto: 'Como límites identificamos el uso de IDs de estado fijos (hardcodeados del 1 al 5) en lugar de constantes de package o búsquedas dinámicas, y la inclusión de COMMIT dentro de los procedimientos, lo que resta control transaccional a la aplicación consumidora. Como mejora a futuro, eliminaríamos el COMMIT interno y optimizaríamos contar_pedidos_fallidos para evitar consultas repetitivas tipo N+1 en grandes volúmenes.' },
         { titulo: 'Lo que aprendimos usando IA',

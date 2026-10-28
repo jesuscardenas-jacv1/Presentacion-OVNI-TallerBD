@@ -464,4 +464,23 @@ WHERE id_pedido IN (2, 3);          -- 2 filas
 ROLLBACK;  -- fue solo una prueba
 `,
 
+  /* ---------- PAQUETE EJECUTADO EN BLOQUE ANÓNIMO (lámina de paquetes) ---------- */
+
+  uso_paquete_bloque: String.raw`
+SET SERVEROUTPUT ON
+
+DECLARE
+    v_msg VARCHAR2(200);
+BEGIN
+    pkg_reparto.registrar_entrega(1, 'FALLIDO', 'CLIENTE_AUSENTE', v_msg);
+    DBMS_OUTPUT.PUT_LINE(v_msg);
+END;
+/
+
+-- Salida esperada:
+--   Entregas fallidas: 1           <- lo imprime trg_contar_fallidas
+--   Entrega registrada correctamente
+ROLLBACK;  -- fue solo una prueba
+`,
+
 };
