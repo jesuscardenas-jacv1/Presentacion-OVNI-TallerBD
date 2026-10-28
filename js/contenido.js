@@ -174,54 +174,6 @@ window.PRESENTACION = {
       ]
     },
 
-    /* ---------- 6. Procedimiento con parámetros ---------- */
-    {
-      id: 'proc-con',
-      tipo: 'codigo',
-      seccion: 'Funciones y procedimientos',
-      titulo: 'registrar_entrega, con parámetros',
-      resumen: [
-        'Recibe el pedido, el resultado y la razón; devuelve un mensaje por el parámetro OUT.',
-        'Solo acepta LOGRADO o FALLIDO, sin importar mayúsculas. Cualquier otro valor se rechaza.',
-        'Si es FALLIDO exige una razón y la valida con la función privada es_razon_valida.',
-        'Actualiza pedido y factura. Si el pedido no existe, SQL%ROWCOUNT queda en 0 y se avisa.',
-        'COMMIT si todo sale bien; ROLLBACK y mensaje por OUT ante cualquier excepción.'
-      ],
-      paneles: [
-        { etiqueta: 'Código', clave: 'proc_registrar_entrega' },
-        { etiqueta: 'Cómo se invoca', clave: 'uso_registrar_entrega' }
-      ],
-      preguntas: [
-        '162. Seleccione un procedimiento y explique su funcionamiento paso a paso.',
-        '50. ¿Qué ocurriría si un parámetro recibiera un valor inesperado?',
-        '55. ¿Cómo identificaríamos si un procedimiento modifica más registros de los que debería?',
-        '175. Si tuviera que modificar una condición del problema, ¿qué parte del código cambiaría?'
-      ]
-    },
-
-    /* ---------- 7. Procedimiento sin parámetros ---------- */
-    {
-      id: 'proc-sin',
-      tipo: 'codigo',
-      seccion: 'Funciones y procedimientos',
-      titulo: 'cerrar_rutas_completas, sin parámetros',
-      resumen: [
-        'No recibe nada: siempre revisa todas las rutas EN_CURSO.',
-        'Pasa a FINALIZADA las que tienen pedidos y no les queda ninguno CREADO ni EN_RUTA.',
-        'Una ruta sin pedidos no se cierra: el EXISTS lo impide.',
-        'SQL%ROWCOUNT dice cuántas cerró. Si se ejecuta dos veces, la segunda cierra 0.'
-      ],
-      paneles: [
-        { etiqueta: 'Código', clave: 'proc_sin_parametros' },
-        { etiqueta: 'Cómo se ejecuta', clave: 'uso_proc_sin_parametros' }
-      ],
-      preguntas: [
-        '46. ¿Qué problema específico resuelve cada procedimiento de nuestro proyecto?',
-        '51. ¿Cómo se ejecuta el procedimiento y cómo comprobamos su resultado?',
-        '57. ¿Cómo podríamos adaptar el procedimiento si cambiara una regla de negocio?'
-      ]
-    },
-
     /* ---------- 8. Funciones: concepto ---------- */
     {
       id: 'func-concepto',
@@ -249,73 +201,6 @@ window.PRESENTACION = {
       ]
     },
 
-    /* ---------- 9. Función con parámetros ---------- */
-    {
-      id: 'func-con',
-      tipo: 'codigo',
-      seccion: 'Funciones y procedimientos',
-      titulo: 'contar_pedidos_fallidos, con parámetros',
-      resumen: [
-        'Recibe una ruta y devuelve cuántas de sus entregas fallaron.',
-        'Cruza pedido con factura y cuenta las de resultado FALLIDO.',
-        'No modifica datos, por eso sirve dentro de un SELECT.',
-        'Con COUNT siempre vuelve una fila: una ruta sin fallidos devuelve 0.'
-      ],
-      paneles: [
-        { etiqueta: 'Código', clave: 'func_contar_pedidos_fallidos' },
-        { etiqueta: 'Uso en un SELECT', clave: 'uso_contar_pedidos_fallidos' }
-      ],
-      preguntas: [
-        '164. Explique una función almacenada e indique qué valor devuelve.',
-        '165. ¿Cómo se utiliza esa función desde SQL?',
-        '66. ¿Qué sucedería si la función recibiera valores nulos o datos inesperados?',
-        '176. Si una función devolviera un resultado incorrecto, ¿cómo investigaría la causa?'
-      ]
-    },
-
-    /* ---------- 10. Función sin parámetros ---------- */
-    {
-      id: 'func-sin',
-      tipo: 'codigo',
-      seccion: 'Funciones y procedimientos',
-      titulo: 'total_pedidos_en_ruta, sin parámetros',
-      resumen: [
-        'No recibe nada y devuelve cuántos pedidos siguen EN_RUTA, sumando todas las rutas.',
-        'Solo lee pedido, así que se puede usar dentro de un SELECT.',
-        'Al no tener parámetros se llama sin paréntesis, desde DUAL.',
-        'Se comprueba con un COUNT(*) a mano: los dos números deben coincidir.'
-      ],
-      paneles: [
-        { etiqueta: 'Código', clave: 'func_sin_parametros' },
-        { etiqueta: 'Uso en un SELECT', clave: 'uso_func_sin_parametros' }
-      ],
-      preguntas: [
-        '59. ¿Qué necesidad del proyecto resuelve cada función?',
-        '63. ¿Qué diferencia existe entre una función con parámetros y una sin parámetros?',
-        '67. ¿Cómo comprobaríamos que el valor devuelto es correcto?'
-      ]
-    },
-
-    /* ---------- 13. Triggers: demo fila / sentencia ---------- */
-    {
-      id: 'trg-demo',
-      tipo: 'disparos',
-      seccion: 'Triggers',
-      titulo: 'Fila o sentencia: cuántas veces dispara',
-      idea: 'El rayo de fila abduce paquete por paquete. El de sentencia se enciende una sola vez por operación, cambie las filas que cambie.',
-      sentencia: "UPDATE factura\nSET resultado_entrega = 'LOGRADO'\nWHERE id_pedido IN (...);",
-      notas: [
-        'De fila: lleva FOR EACH ROW y ve :OLD y :NEW de cada fila.',
-        'De sentencia: no lleva FOR EACH ROW y no conoce :OLD ni :NEW.'
-      ],
-      preguntas: [
-        '86. ¿Qué diferencia existe entre un trigger a nivel de fila y uno a nivel de sentencia?',
-        '91. ¿Qué sucede si una operación afecta a varias filas?',
-        '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?',
-        '96. ¿Qué es una tabla mutante y en qué circunstancias puede aparecer ese problema?'
-      ]
-    },
-
     /* ---------- 14. Trigger de fila ---------- */
     {
       id: 'trg-fila',
@@ -338,6 +223,41 @@ window.PRESENTACION = {
         '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?',
         '99. ¿Por qué elegimos utilizar un trigger y no otra alternativa?',
         '100. ¿Qué pruebas realizamos para comprobar que el trigger no se activa en situaciones incorrectas?'
+      ]
+    },
+    /* ---------- Triggers: estado antes y después ---------- */
+    {
+      id: 'trg-estado',
+      tipo: 'concepto',
+      seccion: 'Triggers',
+      titulo: 'Cómo revisamos el efecto del trigger',
+      idea: 'Miramos la tabla notificacion antes del UPDATE y otra vez después. Lo que cambió entre las dos consultas es lo que dejó el trigger.',
+      columnas: [
+        {
+          titulo: 'Antes del UPDATE',
+          puntos: [
+            'Se consulta notificacion y se anota qué avisos existen para cada pedido.',
+            'Luego se hace el UPDATE sobre factura: resultado_entrega pasa a FALLIDO o LOGRADO.'
+          ]
+        },
+        {
+          titulo: 'Después del UPDATE',
+          puntos: [
+            'El trigger de fila agregó un aviso por cada factura que cambió.',
+            'En la prueba P8 quedaron avisos para los pedidos 1, 2 y 3.'
+          ]
+        },
+        {
+          titulo: 'Qué hay que tener en cuenta',
+          puntos: [
+            'Los ids 2 y 3 quedaron libres por el ROLLBACK de P10: la secuencia no se revierte.',
+            'Si el UPDATE cambia solo otra columna, el resultado (P9) todavía está pendiente de confirmar.'
+          ]
+        }
+      ],
+      preguntas: [
+        '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?',
+        '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?'
       ]
     },
 
@@ -395,65 +315,6 @@ window.PRESENTACION = {
       ]
     },
 
-    /* ---------- 15. Trigger de sentencia ---------- */
-    {
-      id: 'trg-sentencia',
-      tipo: 'codigo',
-      seccion: 'Triggers',
-      titulo: 'trg_contar_fallidas, a nivel de sentencia',
-      resumen: [
-        'Es el trigger de la nave, ya corregido: sin FOR EACH ROW.',
-        'Evento: después de un UPDATE de resultado_entrega en factura.',
-        'Se dispara una vez por sentencia, cambie 1 fila o 100, cuando el UPDATE ya terminó.',
-        'Por eso puede leer factura sin ORA-04091, pero no conoce :OLD ni :NEW.',
-        'Prueba: un UPDATE de 2 filas imprime una sola línea; el de fila crea 2 notificaciones.'
-      ],
-      paneles: [
-        { etiqueta: 'Código', clave: 'trg_sentencia' },
-        { etiqueta: 'Cómo se comprueba', clave: 'uso_trg_sentencia' }
-      ],
-      preguntas: [
-        '85. ¿Qué regla de negocio o necesidad de control resuelve cada trigger?',
-        '169. ¿Qué diferencia habría si ese trigger fuera a nivel de sentencia en lugar de fila, o viceversa?',
-        '93. ¿Qué riesgos existen al utilizar triggers para implementar reglas de negocio?'
-      ]
-    },
-    /* ---------- Triggers: estado antes y después ---------- */
-    {
-      id: 'trg-estado',
-      tipo: 'concepto',
-      seccion: 'Triggers',
-      titulo: 'Cómo revisamos el efecto del trigger',
-      idea: 'Miramos la tabla notificacion antes del UPDATE y otra vez después. Lo que cambió entre las dos consultas es lo que dejó el trigger.',
-      columnas: [
-        {
-          titulo: 'Antes del UPDATE',
-          puntos: [
-            'Se consulta notificacion y se anota qué avisos existen para cada pedido.',
-            'Luego se hace el UPDATE sobre factura: resultado_entrega pasa a FALLIDO o LOGRADO.'
-          ]
-        },
-        {
-          titulo: 'Después del UPDATE',
-          puntos: [
-            'El trigger de fila agregó un aviso por cada factura que cambió.',
-            'En la prueba P8 quedaron avisos para los pedidos 1, 2 y 3.'
-          ]
-        },
-        {
-          titulo: 'Qué hay que tener en cuenta',
-          puntos: [
-            'Los ids 2 y 3 quedaron libres por el ROLLBACK de P10: la secuencia no se revierte.',
-            'Si el UPDATE cambia solo otra columna, el resultado (P9) todavía está pendiente de confirmar.'
-          ]
-        }
-      ],
-      preguntas: [
-        '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?',
-        '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?'
-      ]
-    },
-
 
     /* ---------- 11. Package: demo público / privado ---------- */
     {
@@ -502,32 +363,6 @@ window.PRESENTACION = {
         '167. ¿Por qué se tomó esa decisión de encapsulamiento?'
       ]
     },
-
-    /* ---------- 12. Package: código ---------- */
-    {
-      id: 'pkg-codigo',
-      tipo: 'codigo',
-      seccion: 'Paquetes',
-      titulo: 'Especificación y cuerpo de pkg_reparto',
-      resumen: [
-        'La especificación declara qué existe: un tipo, tres procedimientos y dos funciones.',
-        'El cuerpo guarda cómo funciona y lo que nadie más necesita ver.',
-        'Privados: el catálogo de razones, tres excepciones de negocio y la función es_razon_valida.',
-        'Si cambia el cuerpo y no la especificación, quien usa el package no se entera.'
-      ],
-      paneles: [
-        { etiqueta: 'Especificación (público)', clave: 'pkg_especificacion' },
-        { etiqueta: 'Cuerpo: lo privado', clave: 'pkg_privados' },
-        { etiqueta: 'Función privada', clave: 'pkg_func_privada' },
-        { etiqueta: 'Cursor con RECORD', clave: 'proc_listar_pedidos' },
-        { etiqueta: 'Uso del Cursor', clave: 'uso_listar_pedidos' }
-      ],
-      preguntas: [
-        '166. Explique la organización de su package y distinga sus elementos públicos y privados.',
-        '78. ¿Qué ocurriría si necesitáramos modificar la implementación interna de una función privada?',
-        '81. ¿Qué errores podrían aparecer si la especificación y el cuerpo del package no fueran coherentes?'
-      ]
-    },
     /* ---------- Paquetes: ejecución en bloque anónimo ---------- */
     {
       id: 'pkg-ejecutar',
@@ -547,53 +382,28 @@ window.PRESENTACION = {
       ]
     },
 
-
-    /* ---------- 16. Pruebas ---------- */
+    /* ---------- 18. Conclusiones ---------- */
     {
-      id: 'pruebas',
-      tipo: 'pruebas',
-      seccion: 'Pruebas',
-      titulo: 'Lo que esperábamos y lo que salió',
-      /* Las pruebas están en sql/3_datos_y_pruebas.sql (P1 a P15 + Volumen), con los datos que usan. */
-      filas: [
-        { objeto: 'registrar_entrega', prueba: 'Fallida con razón del catálogo (P1)',
-          datos: "Pedido 1, 'FALLIDO', 'CLIENTE_AUSENTE'",
-          esperado: 'Entrega registrada correctamente',
-          obtenido: 'Entregas fallidas: 1, luego "Entrega registrada correctamente". Igual al esperado.' },
-        { objeto: 'registrar_entrega', prueba: 'Datos inválidos (P2 a P5)',
-          datos: 'Razón inventada, sin razón, ENTREGADO, pedido 999',
-          esperado: 'Un error por caso; nada cambia',
-          obtenido: 'Los 4 mensajes salieron como se esperaba. La comprobación de estados queda por confirmar.' },
-        { objeto: 'las dos funciones', prueba: 'Con y sin parámetros (P6, P7)',
-          datos: 'Todas las rutas; desde DUAL',
-          esperado: 'Ruta 1: 1, ruta 2: 0. En ruta: 3 (antes de P12)',
-          obtenido: 'Ruta 1: 1, ruta 2: 0. En ruta: 1 al final del script, porque P12 ya dejó los pedidos 2 y 3 como ENTREGADO. El 3 corresponde a antes de P12.' },
-        { objeto: 'trg_notificar_entrega', prueba: 'Fila: avisa si se actualiza resultado_entrega, no otra columna (P8, P9)',
-          datos: 'Después de P1; UPDATE de foto_url',
-          esperado: '1 aviso al pedido 1; 0 al pedido 4',
-          obtenido: 'P8: quedaron 3 avisos, uno por pedido 1, 2 y 3. Los ids 2 y 3 quedaron libres por el ROLLBACK de P10. P9: el conteo de avisos del pedido 4 queda pendiente.' },
-        { objeto: 'trg_contar_fallidas', prueba: 'Sentencia: una vez por UPDATE (P10)',
-          datos: 'Un UPDATE de los pedidos 2 y 3',
-          esperado: '1 línea impresa y 2 avisos nuevos',
-          obtenido: '2 filas actualizadas y una sola línea "Entregas fallidas: 1". Los avisos nuevos quedan pendientes de confirmar.' },
-        { objeto: 'cerrar_rutas_completas', prueba: 'Cierra rutas terminadas (P11-P13)',
-          datos: 'Antes y después de entregar 2 y 3',
-          esperado: 'Cierra 0, luego 1, luego 0',
-          obtenido: 'Rutas cerradas: 0, luego 1, luego 0. Al final: ruta 1 FINALIZADA y ruta 2 EN_CURSO. Igual al esperado.' },
-        { objeto: 'listar_pedidos_por_ruta', prueba: 'Cursor complejo con RECORD (P15)',
-          datos: 'Ruta 1 con pedidos 1, 2 y 3',
-          esperado: 'Detalle de cada pedido con su cliente y estado',
-          obtenido: '1 - Cliente A - FALLIDO | 2 - Cliente B - ENTREGADO | 3 - Cliente C - ENTREGADO' },
-        { objeto: 'Procesamiento masivo', prueba: 'Prueba de volumen en lote (Sección 7)',
-          datos: '200 pedidos masivos con CONNECT BY, 40 fallidos y 160 logrados',
-          esperado: '40 fallidos contados, 200 avisos individuales, ROLLBACK limpio',
-          obtenido: '40 fallidos contados, 200 notificaciones creadas, ROLLBACK ejecutado con éxito' }
+      id: 'conclusiones',
+      tipo: 'conclusiones',
+      seccion: 'Conclusiones',
+      titulo: 'Qué se llevan de vuelta a su planeta',
+      bloques: [
+        { titulo: 'Lo que construimos',
+          texto: 'La lógica del reparto vive en la base de datos: pkg_reparto registra las entregas y valida las razones de fallo, y el trigger avisa al cliente sin que nadie tenga que acordarse.' },
+        { titulo: 'Qué cambia para el negocio',
+          texto: 'Los motivos de fallo quedan estandarizados, pedido y factura nunca quedan a medias y el aviso al cliente sale en el momento.' },
+        { titulo: 'Competencias que nos llevamos',
+          texto: 'Diseñar reglas de negocio dentro de la base (package, procedimientos, funciones, triggers, cursores y excepciones) y probarlas con datos antes de darlas por buenas. Para nuestra formación como ingenieros de software, esto sirve para razonar sobre la integridad de los datos y revisar cualquier propuesta, también la de una IA, antes de aceptarla.' },
+        { titulo: 'Límites y mejoras',
+          texto: 'Como límites identificamos el uso de IDs de estado fijos (hardcodeados del 1 al 5) en lugar de constantes de package o búsquedas dinámicas, y la inclusión de COMMIT dentro de los procedimientos, lo que resta control transaccional a la aplicación consumidora. Como mejora a futuro, eliminaríamos el COMMIT interno y optimizaríamos contar_pedidos_fallidos para evitar consultas repetitivas tipo N+1 en grandes volúmenes.' },
+        { titulo: 'Lo que aprendimos usando IA',
+          texto: 'La IA aceleró la estructuración de la especificación y cuerpo del package, pero no anticipó restricciones intrínsecas de Oracle como la tabla mutante (ORA-04091) ni el comportamiento de COUNT(*) ante excepciones. Aprendimos a usar la IA como asistente de borrador y no como juez de diseño, validando cada regla con pruebas de estrés en el motor.' }
       ],
       preguntas: [
-        '170. Muestre una prueba que permita comprobar el funcionamiento de uno de sus objetos.',
-        '171. ¿Qué resultado esperaba y cómo interpreta el resultado obtenido?',
-        '132. ¿Qué casos límite o excepcionales consideramos?',
-        '141. ¿Qué escenarios todavía no hemos probado?'
+        '181. ¿Qué parte de su solución considera más sólida y qué parte necesita mejorar?',
+        '183. ¿Qué cambiaría si tuviera que implementar nuevamente el proyecto?',
+        '179. Si el proyecto tuviera que procesar muchos más registros, ¿qué aspectos evaluaría?'
       ]
     },
 
@@ -622,31 +432,6 @@ window.PRESENTACION = {
         '173. ¿Qué respuesta de la IA tuvo que revisar, corregir o adaptar?',
         '174. ¿Cómo supo que la solución propuesta por la IA era correcta?',
         '184. ¿Qué responsabilidad asume sobre el código presentado, independientemente de quién o qué herramienta lo haya generado?'
-      ]
-    },
-
-    /* ---------- 18. Conclusiones ---------- */
-    {
-      id: 'conclusiones',
-      tipo: 'conclusiones',
-      seccion: 'Conclusiones',
-      titulo: 'Qué se llevan de vuelta a su planeta',
-      bloques: [
-        { titulo: 'Lo que construimos',
-          texto: 'La lógica del reparto vive en la base de datos: pkg_reparto registra las entregas y valida las razones de fallo, y el trigger avisa al cliente sin que nadie tenga que acordarse.' },
-        { titulo: 'Qué cambia para el negocio',
-          texto: 'Los motivos de fallo quedan estandarizados, pedido y factura nunca quedan a medias y el aviso al cliente sale en el momento.' },
-        { titulo: 'Competencias que nos llevamos',
-          texto: 'Diseñar reglas de negocio dentro de la base (package, procedimientos, funciones, triggers, cursores y excepciones) y probarlas con datos antes de darlas por buenas. Para nuestra formación como ingenieros de software, esto sirve para razonar sobre la integridad de los datos y revisar cualquier propuesta, también la de una IA, antes de aceptarla.' },
-        { titulo: 'Límites y mejoras',
-          texto: 'Como límites identificamos el uso de IDs de estado fijos (hardcodeados del 1 al 5) en lugar de constantes de package o búsquedas dinámicas, y la inclusión de COMMIT dentro de los procedimientos, lo que resta control transaccional a la aplicación consumidora. Como mejora a futuro, eliminaríamos el COMMIT interno y optimizaríamos contar_pedidos_fallidos para evitar consultas repetitivas tipo N+1 en grandes volúmenes.' },
-        { titulo: 'Lo que aprendimos usando IA',
-          texto: 'La IA aceleró la estructuración de la especificación y cuerpo del package, pero no anticipó restricciones intrínsecas de Oracle como la tabla mutante (ORA-04091) ni el comportamiento de COUNT(*) ante excepciones. Aprendimos a usar la IA como asistente de borrador y no como juez de diseño, validando cada regla con pruebas de estrés en el motor.' }
-      ],
-      preguntas: [
-        '181. ¿Qué parte de su solución considera más sólida y qué parte necesita mejorar?',
-        '183. ¿Qué cambiaría si tuviera que implementar nuevamente el proyecto?',
-        '179. Si el proyecto tuviera que procesar muchos más registros, ¿qué aspectos evaluaría?'
       ]
     },
 
