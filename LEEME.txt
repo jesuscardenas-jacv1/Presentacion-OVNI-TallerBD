@@ -18,7 +18,7 @@ TECLAS
   F                          pantalla completa
   Esc                        cerrar índice, ensayo o código ampliado
 
-LÁMINA 8: LA NAVE QUE CAE
+LÁMINA 7: LA NAVE QUE CAE
   Al llegar a la lámina el alien escribe un trigger con error de tabla
   mutante (ORA-04091) y la animación SE DETIENE para explicar la consulta.
   Para continuar: botón "Ejecutar", o espacio, Enter, flecha derecha o
@@ -26,7 +26,7 @@ LÁMINA 8: LA NAVE QUE CAE
   en un maizal. Flecha izquierda vuelve a la lámina anterior. Al final aparece la explicación con
   los botones "Repetir la misión" y "Ver los triggers".
   "Saltar al final" va directo a la explicación.
-  Las láminas 8 y 9 van justo después de Triggers de fila: primero se explica
+  Las láminas 7 y 8 van justo después de Triggers de fila: primero se explica
   el problema, luego la nave muestra el error y su corrección.
   El código y el error de la pantalla se cambian en js/codigos.js, claves
   caida_sql y caida_error. Los textos del final, en js/contenido.js (id 'mision').

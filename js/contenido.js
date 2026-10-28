@@ -261,26 +261,6 @@ window.PRESENTACION = {
       ]
     },
 
-    /* ---------- Triggers: P8 en pantalla (un aviso por factura) ---------- */
-    {
-      id: 'trg-p8',
-      tipo: 'terminal',
-      seccion: 'Triggers',
-      titulo: 'P8 en pantalla: un aviso por cada factura',
-      idea: 'Así se ve la comprobación del trigger de fila en SQL Developer.',
-      lineas: [
-        { tipo: 'sql', texto: 'SELECT id_notificacion, id_pedido, tipo' },
-        { tipo: 'sql', texto: 'FROM notificacion ORDER BY id_notificacion;' },
-        { tipo: 'salida', texto: 'ID_NOTIFICACION   ID_PEDIDO   TIPO' },
-        { tipo: 'salida', texto: '1                 1          EMAIL' },
-        { tipo: 'salida', texto: '4                 2          EMAIL' },
-        { tipo: 'salida', texto: '5                 3          EMAIL', destacar: true, nota: 'un aviso por pedido, creado por el trigger de fila' },
-        { tipo: 'nota', texto: 'El trigger de fila crea un aviso por cada factura que se actualiza.' }
-      ],
-      preguntas: [
-        '87. ¿Qué diferencia existe entre ejecutar un trigger antes o después de una operación?'
-      ]
-    },
 
     /* ---------- 2. Animación: la nave que cayó ----------
        El código y el error que aparecen en la pantalla de la nave
