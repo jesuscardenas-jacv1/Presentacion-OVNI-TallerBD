@@ -261,6 +261,41 @@ window.PRESENTACION = {
       ]
     },
 
+    /* ---------- Triggers: P10 en tres pasos ---------- */
+    {
+      id: 'trg-p10',
+      tipo: 'concepto',
+      seccion: 'Triggers',
+      titulo: 'P10: un UPDATE, dos triggers y un ROLLBACK',
+      idea: 'Cambiamos dos facturas con un solo UPDATE y después deshacemos todo.',
+      columnas: [
+        {
+          titulo: '1. Antes del UPDATE',
+          puntos: [
+            'Solo hay un aviso: el del pedido 1, de la prueba P1.',
+            'Los pedidos 2 y 3 todavía no tienen resultado.'
+          ]
+        },
+        {
+          titulo: '2. Después del UPDATE',
+          puntos: [
+            'El trigger de fila crea un aviso por cada factura cambiada.',
+            'El trigger de sentencia imprime una sola línea: "Entregas fallidas: 1".'
+          ]
+        },
+        {
+          titulo: '3. Consideración',
+          puntos: [
+            'El ROLLBACK borra los avisos nuevos.',
+            'Los ids 2 y 3 ya se usaron, por eso el siguiente aviso salta al 4.'
+          ]
+        }
+      ],
+      preguntas: [
+        '92. ¿Cómo verificaríamos cuántas veces se ejecuta un trigger durante una operación que modifica múltiples registros?'
+      ]
+    },
+
     /* ---------- 2. Animación: la nave que cayó ----------
        El código y el error que aparecen en la pantalla de la nave
        están en js/codigos.js (claves caida_sql y caida_error). */
